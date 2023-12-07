@@ -1,13 +1,14 @@
 'use client';
 
-import { Menu, Group, Center, Burger, Container } from '@mantine/core';
+import { Menu, Group, Center, Burger, Container, Image, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconChevronDown } from '@tabler/icons-react';
-import { MantineLogo } from '@mantinex/mantine-logo';
 import classes from './HeaderMenu.module.css';
+import Link from 'next/link';
 
 const links = [
-  { link: '/about', label: 'Features' },
+  { link: '/register', label: '新規登録' },
+  { link: '/login', label: 'ログイン' },
   {
     link: '#1',
     label: 'Learn',
@@ -33,6 +34,8 @@ const links = [
 
 export function HeaderMenu() {
   const [opened, { toggle }] = useDisclosure(false);
+  const logoSrc = 'header-logo.png';
+  const logoText = '技術士1次試験 基礎•適正科目 過去問ドリル'; 
 
   const items = links.map((link) => {
     const menuItems = link.links?.map((item) => (
@@ -60,14 +63,9 @@ export function HeaderMenu() {
     }
 
     return (
-      <a
-        key={link.label}
-        href={link.link}
-        className={classes.link}
-        onClick={(event) => event.preventDefault()}
-      >
+      <Link key={link.label} href={link.link} className={classes.link}>
         {link.label}
-      </a>
+      </Link>
     );
   });
 
@@ -75,7 +73,12 @@ export function HeaderMenu() {
     <header className={classes.header}>
       <Container size="md">
         <div className={classes.inner}>
-          <MantineLogo size={28} />
+          <Link href="/">
+            <Center>
+                <Image src={logoSrc} alt="Logo" h={40} />
+                <Text size="xl" fw={900} className={classes.logoText}>{logoText}</Text>
+            </Center>
+          </Link>
           <Group gap={5} visibleFrom="sm">
             {items}
           </Group>
