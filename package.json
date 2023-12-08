@@ -15,7 +15,8 @@
     "@tabler/icons-react": "^2.42.0",
     "next": "14.0.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tabler-icons-react": "^1.56.0"
   },
   "devDependencies": {
     "@types/node": "^20",
