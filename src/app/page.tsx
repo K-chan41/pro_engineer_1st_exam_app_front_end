@@ -1,13 +1,27 @@
 'use client';
 
-import { Image, Container, Title, Button, Group, Text, List, ThemeIcon, rem, Tabs } from '@mantine/core';
-import { IconPhoto, IconMessageCircle, IconSettings } from '@tabler/icons-react';
+import { useState, useEffect } from 'react';
+import { Image, Container, Text, rem, Tabs, Checkbox, Group } from '@mantine/core';
 import { ReportSearch, Ballpen } from 'tabler-icons-react';
 import classes from './HeroBullets.module.css';
 
 export default function Home() {
+  const [subjects, setSubjects] = useState({ basic_subject: [], aptitude_subject: [] });
   const topImage = 'top-image.svg';
   const iconStyle = { width: rem(12), height: rem(12) };
+
+  useEffect(() => {
+    // バックエンドから科目データを取得する
+    fetch('http://localhost:4000/api/v1/subjects')
+      .then(response => response.json())
+      .then(data => {
+        // 取得したデータから、科目ごとのチェックボックスリストを作成する
+        const basic = data.data.filter(subject => subject.attributes.exam_subject === 'basic_subject');
+        const aptitude = data.data.filter(subject => subject.attributes.exam_subject === 'aptitude_subject');
+        setSubjects({ basic_subject: basic, aptitude_subject: aptitude });
+      });
+  }, []);
+
 
   return (
     <>
@@ -21,40 +35,38 @@ export default function Home() {
           <Image src={topImage} className={classes.image} />
         </div>
       </Container>
-      <Ballpen
-    size={48}
-    strokeWidth={2}
-    color={'black'}
-  />;
-<ReportSearch
-    size={48}
-    strokeWidth={2}
-    color={'black'}
-  />;
       <Container>
-        <Tabs radius="md" defaultValue="gallery">
+        <Tabs radius="md" defaultValue="basic_subject">
           <Tabs.List>
-            <Tabs.Tab value="gallery" leftSection={<IconPhoto style={iconStyle} />}>
-              Gallery
+            <Tabs.Tab value="basic_subject" leftSection={<Ballpen size={32} strokeWidth={2} color={'black'}/>}>
+              基礎科目
             </Tabs.Tab>
-            <Tabs.Tab value="messages" leftSection={<IconMessageCircle style={iconStyle} />}>
-              Messages
-            </Tabs.Tab>
-            <Tabs.Tab value="settings" leftSection={<IconSettings style={iconStyle} />}>
-              Settings
+            <Tabs.Tab value="aptitude_subject" leftSection={<ReportSearch size={32} strokeWidth={2} color={'black'}/>}>
+              適正科目
             </Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="gallery">
-            Gallery tab content
+          <Tabs.Panel value="basic_subject">
+            <Group direction={"column"}>
+              {subjects.basic_subject.map((subject, index) => (
+                <Checkbox 
+                  key={subject.id} 
+                  label={`${subject.attributes.year}年 ${subject.attributes.exam_subject}`} 
+                  value={subject.id}
+                />
+              ))}
+            </Group>
           </Tabs.Panel>
-
-          <Tabs.Panel value="messages">
-            Messages tab content
-          </Tabs.Panel>
-
-          <Tabs.Panel value="settings">
-            Settings tab content
+          <Tabs.Panel value="aptitude_subject"  pb="xs">
+            <Group direction="column">
+              {subjects.aptitude_subject.map((subject, index) => (
+                <Checkbox 
+                  key={subject.id} 
+                  label={`${subject.attributes.year}年 ${subject.attributes.exam_subject}`} 
+                  value={subject.id}
+                />
+              ))}
+            </Group>
           </Tabs.Panel>
         </Tabs>
       </Container>

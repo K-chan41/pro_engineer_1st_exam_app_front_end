@@ -6,7 +6,7 @@ import './globals.css';
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
 
-import classes from './active.module.css';
+// import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
 
 export const metadata: Metadata = {
