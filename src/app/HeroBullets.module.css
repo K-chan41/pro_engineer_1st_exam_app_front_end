@@ -46,3 +46,14 @@
   border-radius: var(--mantine-radius-sm);
   padding: rem(4px) rem(12px);
 }
+
+.tabs_list {
+  margin-bottom: calc(var(--mantine-spacing-xl) * 1);
+  @media (max-width: $mantine-breakpoint-xs) {
+    margin-bottom: calc(var(--mantine-spacing-xl) * 1);
+  }
+}
+
+.group {
+  flex-direction: column;
+}
