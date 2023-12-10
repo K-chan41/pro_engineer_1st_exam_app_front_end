@@ -1,8 +1,11 @@
 .header {
+  position: fixed;
+  width: 100%;
   height: rem(56px);
-  margin-bottom: rem(120px);
+  margin-bottom: rem(12px);
   background-color: var(--mantine-color-body);
   border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  z-index: 100;
 }
 
 .inner {
@@ -29,4 +32,17 @@
 
 .linkLabel {
   margin-right: rem(5px);
+}
+
+/* 画像のスタイル (サイズやマージンを調整) */
+.image {
+  /* 必要なスタイルをここに追加 */
+  margin-right: rem(5px);
+}
+
+/* ロゴテキストのスタイル */
+.logoText {
+  font-size: 1rem; /* フォントサイズを指定 */
+  margin-left: 0.5rem; /* 画像とテキストの間のスペース */
+  /* その他のスタイル */
 }
