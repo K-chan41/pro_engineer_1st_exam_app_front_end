@@ -83,6 +83,7 @@ interface ApiResponse {
 export default function QuestionsPage() {
   const searchParams = useSearchParams();
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [choices, setChoices] = useState<Choice[]>([]);
 
   useEffect(() => {
     const subjectIds = searchParams.get('subject_ids[]');
@@ -95,19 +96,28 @@ export default function QuestionsPage() {
       fetch(`http://localhost:4000/api/v1/questions/filter?${query}`)
         .then(response => response.json())
         .then((responseData: ApiResponse) => {
-          // responseData.data で直接データを取得
-          setQuestions(responseData.data.filter(item => item.type === 'question'));
+          setQuestions(responseData.data.filter(item => item.type === 'question') as Question[]);
+          setChoices(responseData.data.filter(item => item.type === 'choice') as Choice[]);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
         });
     }
   }, [searchParams]);
 
-  console.log(questions);
+  // console.log(questions);
 
   return (
     <div>
-      {questions.map((question, index) => (
-        <div key={index}>
+      {questions.map((question) => (
+        <div key={question.id}>
           <p>{question.attributes.content}</p>
+          <ul>
+            {question.relationships.choices.data.map((choiceRelation) => {
+              const choice = choices.find(c => c.id === choiceRelation.id);
+              return choice ? <li key={choice.id}>{choice.attributes.content}</li> : null;
+            })}
+          </ul>
           {/* その他の質問に関連するデータを表示 */}
         </div>
       ))}
