@@ -76,6 +76,44 @@ interface Label {
   };
 }
 
+interface SubjectAttributes {
+  year: number;
+  exam_subject: string;
+}
+
+interface Subject {
+  id: string;
+  type: string;
+  attributes: SubjectAttributes;
+  relationships: {
+    questions: {
+      data: Array<{
+        id: string;
+        type: string;
+      }>;
+    };
+  };
+}
+
+interface LabelAttributes {
+  number: number;
+  title: string;
+}
+
+interface Label {
+  id: string;
+  type: string;
+  attributes: LabelAttributes;
+  relationships: {
+    questions: {
+      data: Array<{
+        id: string;
+        type: string;
+      }>;
+    };
+  };
+}
+
 interface ApiResponse {
   data: Array<Question | Choice | Label>;
 }
@@ -84,10 +122,12 @@ export default function QuestionsPage() {
   const searchParams = useSearchParams();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [choices, setChoices] = useState<Choice[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [labels, setLabels] = useState<Label[]>([]);
 
   useEffect(() => {
     const subjectIds = searchParams.getAll('subject_ids[]');
-    console.log(subjectIds);
+    // console.log(subjectIds);
 
     if (subjectIds) {
       const query = Array.isArray(subjectIds)
@@ -99,12 +139,13 @@ export default function QuestionsPage() {
         .then((responseData: ApiResponse) => {
           const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
           const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
-    
-          console.log('Fetched Questions:', fetchedQuestions);
-          console.log('Fetched Choices:', fetchedChoices);
-    
+          const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
+          const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
+
           setQuestions(fetchedQuestions);
           setChoices(fetchedChoices);
+          setSubjects(fetchedSubjects);
+          setLabels(fetchedLabels);
         })
         .catch(error => {
           console.error('Error fetching data:', error);
@@ -113,19 +154,33 @@ export default function QuestionsPage() {
   }, [searchParams]);
 
   return (
-    <div>
-      {questions.map((question) => (
+    <>
+    {questions.map((question) => {
+      const subject = subjects.find(s => s.id === question.relationships.subject.data.id);
+      const label = labels.find(s => s.id === question.relationships.label.data.id);
+      return (
         <div key={question.id}>
           <p>{question.attributes.content}</p>
           <ul>
             {question.relationships.choices.data.map((choiceRelation) => {
               const choice = choices.find(c => c.id === choiceRelation.id);
-              return choice ? <li key={choice.id}>{choice.attributes.content}</li> : null;
+              return <li key={choice.id}>{choice.attributes.content}</li>;
             })}
           </ul>
+          {subject && (
+            <ul>
+              <li key={subject.id}>{subject.attributes.year} {subject.attributes.exam_subject}</li>
+            </ul>
+          )}
+          {label && (
+            <ul>
+              <li key={label.id}>{label.attributes.number} {label.attributes.title}</li>
+            </ul>
+          )}
           {/* その他の質問に関連するデータを表示 */}
         </div>
-      ))}
-    </div>
+      );
+    })}
+  </>
   );
 }
