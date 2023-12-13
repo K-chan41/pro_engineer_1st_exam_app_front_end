@@ -86,7 +86,8 @@ export default function QuestionsPage() {
   const [choices, setChoices] = useState<Choice[]>([]);
 
   useEffect(() => {
-    const subjectIds = searchParams.get('subject_ids[]');
+    const subjectIds = searchParams.getAll('subject_ids[]');
+    console.log(subjectIds);
 
     if (subjectIds) {
       const query = Array.isArray(subjectIds)
@@ -96,16 +97,20 @@ export default function QuestionsPage() {
       fetch(`http://localhost:4000/api/v1/questions/filter?${query}`)
         .then(response => response.json())
         .then((responseData: ApiResponse) => {
-          setQuestions(responseData.data.filter(item => item.type === 'question') as Question[]);
-          setChoices(responseData.data.filter(item => item.type === 'choice') as Choice[]);
+          const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
+          const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
+    
+          console.log('Fetched Questions:', fetchedQuestions);
+          console.log('Fetched Choices:', fetchedChoices);
+    
+          setQuestions(fetchedQuestions);
+          setChoices(fetchedChoices);
         })
         .catch(error => {
           console.error('Error fetching data:', error);
         });
     }
   }, [searchParams]);
-
-  // console.log(questions);
 
   return (
     <div>
