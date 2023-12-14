@@ -43,12 +43,6 @@ export const metadata: Metadata = {
 // ]
 
 const theme = createTheme({
-  colors: {
-    // Add your color
-    deepBlue: ['#E9EDFC', '#C1CCF6', '#99ABF0' /* ... */],
-    // or replace default theme color
-    blue: ['#E9EDFC', '#C1CCF6', '#99ABF0' /* ... */],
-  },
 
   shadows: {
     md: '1px 1px 3px rgba(0, 0, 0, .25)',
@@ -64,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <head>
-        <ColorSchemeScript defaultColorScheme="light" />
+        {/* <ColorSchemeScript defaultColorScheme="light" /> */}
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
