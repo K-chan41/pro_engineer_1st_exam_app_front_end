@@ -5,7 +5,6 @@ import './globals.css';
 
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
-import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 
 // import classes from './active.module.css';
@@ -43,15 +42,17 @@ export const metadata: Metadata = {
 // ]
 
 const theme = createTheme({
+  primaryColor: 'blue',
+  primaryShade: 6,
 
-  shadows: {
-    md: '1px 1px 3px rgba(0, 0, 0, .25)',
-    xl: '5px 5px 3px rgba(0, 0, 0, .25)',
-  },
+  // shadows: {
+  //   md: '1px 1px 3px rgba(0, 0, 0, .25)',
+  //   xl: '5px 5px 3px rgba(0, 0, 0, .25)',
+  // },
 
-  headings: {
-    fontFamily: 'Roboto, sans-serif',
-  },
+  // headings: {
+  //   fontFamily: 'Roboto, sans-serif',
+  // },
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -62,7 +63,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
-          <Notifications />
           <HeaderMenu />
           {children}
         </MantineProvider>

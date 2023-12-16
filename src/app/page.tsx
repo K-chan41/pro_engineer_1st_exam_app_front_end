@@ -6,7 +6,7 @@ import { ReportSearch, Ballpen } from 'tabler-icons-react';
 import { convertToJapaneseEra } from '../components/utils';
 import classes from './HeroBullets.module.css';
 import { useRouter } from 'next/navigation';
-import { notifications } from '@mantine/notifications';
+import { Notifications, notifications } from '@mantine/notifications';
 
 type Subject = {
   id: string;
@@ -143,8 +143,9 @@ export default function Home() {
             </Group>
           </Tabs.Panel>
         </Tabs >
-        <Button fullWidth variant="filled" size="lg" onClick={navigateToQuestions}>出題開始 (合計{totalQuestions}問)</Button>
+        <Button fullWidth variant="filled" size="lg" color="blue" onClick={navigateToQuestions}>出題開始 (合計{totalQuestions}問)</Button>
       </Container>
+      <Notifications />
     </>
   );
 };
