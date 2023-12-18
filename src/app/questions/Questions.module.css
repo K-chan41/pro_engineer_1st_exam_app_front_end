@@ -3,8 +3,8 @@
   padding-bottom: rem(50px);
 }
 
-.customSlider {
-  width: 14em;
+.customProgress {
+  width: 16em;
   /* margin: 0 auto; */
 }
 
@@ -60,4 +60,15 @@
 .buttonContainer {
   margin-top: var(--mantine-spacing-xl);
   margin-bottom: var(--mantine-spacing-md);
+}
+
+.correctAnswere {
+  font-size: var(--mantine-font-size-xl);
+  font-weight: 800;
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

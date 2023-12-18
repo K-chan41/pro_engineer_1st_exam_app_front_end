@@ -1,6 +1,6 @@
 'use client';
 
-import { Image, Text, Container, Title, SimpleGrid, Button, Slider, Center } from '@mantine/core';
+import { Image, Text, Container, Title, SimpleGrid, Button, Progress, Center, Group } from '@mantine/core';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Notifications, notifications } from '@mantine/notifications';
@@ -141,6 +141,7 @@ export default function QuestionsPage() {
 
   const [userAnswers, setUserAnswers] = useState({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); //　正当数カウント
 
   useEffect(() => {
     const subjectIds = searchParams.getAll('subject_ids[]');
@@ -173,12 +174,17 @@ export default function QuestionsPage() {
   // 解答を保存して解説に遷移する関数
   function handleAnswer(choiceId, choicedIndex, questionId) {
     const isCorrect = questions[currentQuestionIndex].attributes.correct_answer_no == choicedIndex;
+
+    // すでに解答されているかどうかをチェック
+    const alreadyAnswered = userAnswers[questionId]?.answered;
+
     setUserAnswers(prev => ({
       ...prev,
       [questionId]: {
         choiceId: choiceId,  // ユーザーが選んだ選択肢のID
         choicedIndex: choicedIndex, // ユーザが選んだ選択肢のIndex番号:1~5
-        isCorrect: isCorrect // 選んだ選択肢が正解かどうかの真偽値
+        isCorrect: isCorrect, // 選んだ選択肢が正解かどうかの真偽値
+        answered: true  // 解答済みを示す
       }
     }));
 
@@ -204,6 +210,11 @@ export default function QuestionsPage() {
         className: 'my-notification-class',
         loading: false,
       });
+    }
+
+    // 正解かつ初めての解答の場合にカウント
+    if (!alreadyAnswered && isCorrect) {
+      setCorrectAnswersCount(prevCount => prevCount + 1);
     }
 
     // 解答解説へ遷移する
@@ -249,9 +260,9 @@ export default function QuestionsPage() {
         <div>
           {currentQuestion && (
             <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
-                <Text c="dimmed" ta="center">{questions.length}問中0問正解 正解率: 0%</Text>
+                <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
               <Center>
-                <Slider defaultValue={60} size="xs" disabled className={classes.customSlider}/>
+                <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
               </Center>
                 <Text className={classes.supTitle}>第{currentQuestionIndex + 1}問</Text>
 
@@ -316,14 +327,27 @@ export default function QuestionsPage() {
         <div>
           {currentQuestion && (
             <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
-                <Text c="dimmed" ta="center">{questions.length}問中0問正解 正解率: 0%</Text>
+                <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
               <Center>
-                <Slider defaultValue={60} size="xs" disabled className={classes.customSlider}/>
+                <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
               </Center>
-                <Text className={classes.supTitle}>正解</Text>
-                <Text>{currentQuestion.attributes.correct_answer_no}</Text>
-                <Text>あなたの解答：{userAnswers[currentQuestion.id] ? userAnswers[currentQuestion.id].choicedIndex : "未解答"}</Text>
-                <Button onClick={() => setIsQuestionScreen(true)}>問題</Button>
+              <Group justify="space-between">
+                <div>
+                  <Text className={classes.supTitle}>正解</Text>
+                  <Text className={classes.correctAnswere}>{currentQuestion.attributes.correct_answer_no}</Text>
+                  <Text c="dimmed" className={classes.description}>あなたの解答：{userAnswers[currentQuestion.id] ? userAnswers[currentQuestion.id].choicedIndex : "未解答"}</Text>
+                </div>
+                <Button onClick={() => setIsQuestionScreen(true)} variant="default">問題</Button>
+              </Group>
+              <Container size={660} p={0} className={classes.detailContainer}>
+                {currentSubject && (
+                  <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
+                )}
+                {currentLabel && (
+                  <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
+                )}
+                <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
+              </Container>
                 <Text className={classes.supTitle}>解説</Text>
                 <Container size={660} p={0}>
                   <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.commentary}</Text>
