@@ -3,6 +3,11 @@
   padding-bottom: rem(50px);
 }
 
+.table {
+  margin-top: var(--mantine-spacing-md);
+  margin-bottom: var(--mantine-spacing-md);
+}
+
 .customProgress {
   width: 16em;
   /* margin: 0 auto; */

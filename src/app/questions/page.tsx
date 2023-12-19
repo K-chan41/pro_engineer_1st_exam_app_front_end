@@ -1,10 +1,10 @@
 'use client';
 
-import { Image, Text, Container, Title, SimpleGrid, Button, Progress, Center, Group } from '@mantine/core';
+import { Image, Text, Container, Title, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Notifications, notifications } from '@mantine/notifications';
-import { CiCircleCheck, CiCircleRemove } from "react-icons/ci";
+import { CiCircleCheck, CiCircleRemove, CiCircleMinus } from "react-icons/ci";
 import { convertToJapaneseEra } from '../../components/utils';
 import classes from './Questions.module.css';
 
@@ -143,6 +143,9 @@ export default function QuestionsPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0); //　正当数カウント
 
+  const [isQuestionScreen, setIsQuestionScreen] = useState(true); // 問題と解答の画面切り替え
+  const [isResultScreen, setIsResultScreen] = useState(false); // 結果画面への切り替え
+
   useEffect(() => {
     const subjectIds = searchParams.getAll('subject_ids[]');
     // console.log(subjectIds);
@@ -233,131 +236,160 @@ export default function QuestionsPage() {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1);
       setIsQuestionScreen(true);
     } else {
-      // すべての問題に解答し終えた場合の処理
-      // 例: 結果画面に遷移する、結果メッセージを表示するなど
-      handleFinish();
+      setIsResultScreen(true);
     }
   }
-  
-  function handleFinish() {
-    // 結果処理のロジック
-    // 例: スコアの計算、結果画面への遷移、通知の表示など
-  }
-  
 
   // 現在の問題を表示する
   const currentQuestion = questions[currentQuestionIndex];
   const currentSubject = currentQuestion ? subjects.find(s => s.id === currentQuestion.relationships.subject.data.id) : null;
   const currentLabel = currentQuestion ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) : null;
 
-  // 問題と解答の画面切り替え
-  const [isQuestionScreen, setIsQuestionScreen] = useState(true);
+  // 結果表示一覧表
+  const rows = questions.map((question, index) => {
+    const userAnswer = userAnswers[question.id];
+    const isCorrect = userAnswer ? userAnswer.isCorrect : false;
+    const answerIcon = userAnswer ? (isCorrect ? <CiCircleCheck size={24} color="blue"/> : <CiCircleRemove size={24} color="red"/>) : <CiCircleMinus size={24} color="gray"/>;
+
+    return (
+      <Table.Tr key={question.id}>
+        <Table.Td>{index + 1}</Table.Td>
+        <Table.Td c="dimmed">{`${question.attributes.content.substring(0, 30)}...`}</Table.Td>
+        <Table.Td>{answerIcon}</Table.Td>
+      </Table.Tr>
+    );
+  });
 
   return (
     <>
       <Notifications containerWidth={800} notificationMaxHeight={800} position="top-center" />
-      {isQuestionScreen ? (
+      {isResultScreen ? (
         <div>
-          {currentQuestion && (
-            <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
-                <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
-              <Center>
-                <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
-              </Center>
-                <Text className={classes.supTitle}>第{currentQuestionIndex + 1}問</Text>
-
-              <Container size={660} p={0}>
-                <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.content}</Text>
-              </Container>
-
-              <Container size={660} p={0}>
-                {currentQuestion.attributes.content.question_img_src && 
-                  <Image
-                    src={`http://localhost:4000/images/questions/${currentQuestion.attributes.content.question_img_src}.png`}
-                    alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel.attributes.number}-${currentQuestion.attributes.number}`}
-                  />
-                }
-              </Container>
-
-              <Container size={660} p={0}>
-                <SimpleGrid cols={1} spacing={0} className={classes.choice}>
-                  {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
-                    const choice = choices.find(c => c.id === choiceRelation.id);
-                    return (
-                      <Text key={choice.id} c="dimmed">
-                        <span className={classes.indexColor}>{index + 1}.  </span>  {choice.attributes.content}
-                      </Text>
-                    );
-                  })}
-                </SimpleGrid>
-              </Container>
-
-              <Container size={660} p={0} className={classes.detailContainer}>
-                {currentSubject && (
-                  <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
-                )}
-                {currentLabel && (
-                  <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
-                )}
-                <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
-              </Container>
-
-              <Container size={660} p={0} className={classes.buttonContainer}>
-                <SimpleGrid cols={5}>
-                  {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
-                    const choice = choices.find(c => c.id === choiceRelation.id);
-                    return (
-                      <Button
-                        key={choice.id}
-                        variant="outline"
-                        size="compact-xl"
-                        onClick={() => handleAnswer(choice.id, index + 1, currentQuestion.id)}
-                      >
-                        {index + 1}
-                      </Button>
-                    );
-                  })}
-                </SimpleGrid>
-              </Container>
-              <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => setIsQuestionScreen(false)}>解答解説を見る</Button>
+          <Container size={700} className={classes.wrapper}>
+            <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
+            <Center>
+              <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
+            </Center>
+            <Container size={660} p={0} className={classes.table}>
+              <Table striped>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>番号</Table.Th>
+                    <Table.Th>詳細</Table.Th>
+                    <Table.Th>正誤</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
             </Container>
-          )}
+            <Button fullWidth variant="filled" size="lg" color="blue">記録を保存（ログイン/新規登録）</Button>
+          </Container>
         </div>
-        ) : (
-        <div>
-          {currentQuestion && (
-            <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
-                <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
-              <Center>
-                <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
-              </Center>
-              <Group justify="space-between">
-                <div>
-                  <Text className={classes.supTitle}>正解</Text>
-                  <Text className={classes.correctAnswere}>{currentQuestion.attributes.correct_answer_no}</Text>
-                  <Text c="dimmed" className={classes.description}>あなたの解答：{userAnswers[currentQuestion.id] ? userAnswers[currentQuestion.id].choicedIndex : "未解答"}</Text>
-                </div>
-                <Button onClick={() => setIsQuestionScreen(true)} variant="default">問題</Button>
-              </Group>
-              <Container size={660} p={0} className={classes.detailContainer}>
-                {currentSubject && (
-                  <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
-                )}
-                {currentLabel && (
-                  <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
-                )}
-                <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
-              </Container>
-                <Text className={classes.supTitle}>解説</Text>
+      ):(
+      <div>
+        {isQuestionScreen ? (
+          <div>
+            {currentQuestion && (
+              <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
+                  <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
+                <Center>
+                  <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
+                </Center>
+                  <Text className={classes.supTitle}>第{currentQuestionIndex + 1}問</Text>
+
                 <Container size={660} p={0}>
-                  <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.commentary}</Text>
+                  <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.content}</Text>
                 </Container>
-                <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()}>次の問題へ</Button>
-            </Container>
-          )}
-        </div>
-        )
-      }
+
+                <Container size={660} p={0}>
+                  {currentQuestion.attributes.content.question_img_src && 
+                    <Image
+                      src={`http://localhost:4000/images/questions/${currentQuestion.attributes.content.question_img_src}.png`}
+                      alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel.attributes.number}-${currentQuestion.attributes.number}`}
+                    />
+                  }
+                </Container>
+
+                <Container size={660} p={0}>
+                  <SimpleGrid cols={1} spacing={0} className={classes.choice}>
+                    {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
+                      const choice = choices.find(c => c.id === choiceRelation.id);
+                      return (
+                        <Text key={choice.id} c="dimmed">
+                          <span className={classes.indexColor}>{index + 1}.  </span>  {choice.attributes.content}
+                        </Text>
+                      );
+                    })}
+                  </SimpleGrid>
+                </Container>
+
+                <Container size={660} p={0} className={classes.detailContainer}>
+                  {currentSubject && (
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
+                  )}
+                  {currentLabel && (
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
+                  )}
+                  <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
+                </Container>
+
+                <Container size={660} p={0} className={classes.buttonContainer}>
+                  <SimpleGrid cols={5}>
+                    {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
+                      const choice = choices.find(c => c.id === choiceRelation.id);
+                      return (
+                        <Button
+                          key={choice.id}
+                          variant="outline"
+                          size="compact-xl"
+                          onClick={() => handleAnswer(choice.id, index + 1, currentQuestion.id)}
+                        >
+                          {index + 1}
+                        </Button>
+                      );
+                    })}
+                  </SimpleGrid>
+                </Container>
+                <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => setIsQuestionScreen(false)}>解答解説を見る</Button>
+              </Container>
+            )}
+          </div>
+          ) : (
+          <div>
+            {currentQuestion && (
+              <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
+                  <Text c="dimmed" ta="center">{questions.length}問中{correctAnswersCount}問正解 正解率: {(correctAnswersCount / questions.length * 100).toFixed(1)}%</Text>
+                <Center>
+                  <Progress color="gray" radius="md" size="xs" value={Math.round(correctAnswersCount / questions.length * 100)} animated className={classes.customProgress}/>
+                </Center>
+                <Group justify="space-between">
+                  <div>
+                    <Text className={classes.supTitle}>正解</Text>
+                    <Text className={classes.correctAnswere}>{currentQuestion.attributes.correct_answer_no}</Text>
+                    <Text c="dimmed" className={classes.description}>あなたの解答：{userAnswers[currentQuestion.id] ? userAnswers[currentQuestion.id].choicedIndex : "未解答"}</Text>
+                  </div>
+                  <Button onClick={() => setIsQuestionScreen(true)} variant="default">問題</Button>
+                </Group>
+                <Container size={660} p={0} className={classes.detailContainer}>
+                  {currentSubject && (
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
+                  )}
+                  {currentLabel && (
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
+                  )}
+                  <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
+                </Container>
+                  <Text className={classes.supTitle}>解説</Text>
+                  <Container size={660} p={0}>
+                    <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.commentary}</Text>
+                  </Container>
+                  <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()}>次の問題へ</Button>
+              </Container>
+            )}
+          </div>
+        )}
+      </div>
+      )}
     </>
   );
 }
