@@ -9,6 +9,7 @@ import '@mantine/notifications/styles.css';
 
 // import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
+import { Footer } from '../components/Footer'
 
 export const metadata: Metadata = {
   title: {
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MantineProvider theme={theme} defaultColorScheme="light">
           <HeaderMenu />
           {children}
+          <Footer />
         </MantineProvider>
       </body>
     </html>
