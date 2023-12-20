@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Image, Container, Text, rem, Tabs, Checkbox, Group, Button } from '@mantine/core';
 import { ReportSearch, Ballpen } from 'tabler-icons-react';
 import { convertToJapaneseEra } from '../components/utils';
 import classes from './HeroBullets.module.css';
 import { useRouter } from 'next/navigation';
-import { notifications } from '@mantine/notifications';
+import { Notifications, notifications } from '@mantine/notifications';
 
 type Subject = {
   id: string;
@@ -117,34 +117,37 @@ export default function Home() {
             </Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="basic_subject" pb="lg">
-            <Group className={classes.group}>
-              {subjects.basic_subject.map((subject: Subject) => (
-                <Checkbox 
-                  key={subject.id} 
-                  label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
-                  value={subject.id} 
-                  onChange={() => handleSubjectChange(subject.id)}
-                />
-              ))}
-            </Group>
-          </Tabs.Panel>
-          <Tabs.Panel value="aptitude_subject"  pb="lg">
-            <Group className={classes.group}>
-              {subjects.aptitude_subject.map((subject: Subject) => (
-                <Checkbox 
-                  key={subject.id} 
-                  label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
-                  value={subject.id} 
-                  checked={selectedSubjectIds.includes(subject.id)} 
-                  onChange={() => handleSubjectChange(subject.id)}
-                />
-              ))}
-            </Group>
-          </Tabs.Panel>
+          <Suspense fallback={<p>Loading feed...</p>}>
+            <Tabs.Panel value="basic_subject" pb="lg">
+              <Group className={classes.group}>
+                {subjects.basic_subject.map((subject: Subject) => (
+                  <Checkbox 
+                    key={subject.id} 
+                    label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
+                    value={subject.id} 
+                    onChange={() => handleSubjectChange(subject.id)}
+                  />
+                ))}
+              </Group>
+            </Tabs.Panel>
+            <Tabs.Panel value="aptitude_subject"  pb="lg">
+              <Group className={classes.group}>
+                {subjects.aptitude_subject.map((subject: Subject) => (
+                  <Checkbox 
+                    key={subject.id} 
+                    label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
+                    value={subject.id} 
+                    checked={selectedSubjectIds.includes(subject.id)} 
+                    onChange={() => handleSubjectChange(subject.id)}
+                  />
+                ))}
+              </Group>
+            </Tabs.Panel>
+          </Suspense>
         </Tabs >
-        <Button fullWidth variant="filled" size="lg" onClick={navigateToQuestions}>出題開始 (合計{totalQuestions}問)</Button>
+        <Button fullWidth variant="filled" size="lg" color="blue" onClick={navigateToQuestions}>出題開始 (合計{totalQuestions}問)</Button>
       </Container>
+      <Notifications />
     </>
   );
 };

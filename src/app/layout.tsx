@@ -5,11 +5,11 @@ import './globals.css';
 
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
-import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 
 // import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
+import { Footer } from '../components/Footer'
 
 export const metadata: Metadata = {
   title: {
@@ -43,34 +43,30 @@ export const metadata: Metadata = {
 // ]
 
 const theme = createTheme({
-  colors: {
-    // Add your color
-    deepBlue: ['#E9EDFC', '#C1CCF6', '#99ABF0' /* ... */],
-    // or replace default theme color
-    blue: ['#E9EDFC', '#C1CCF6', '#99ABF0' /* ... */],
-  },
+  primaryColor: 'blue',
+  primaryShade: 6,
 
-  shadows: {
-    md: '1px 1px 3px rgba(0, 0, 0, .25)',
-    xl: '5px 5px 3px rgba(0, 0, 0, .25)',
-  },
+  // shadows: {
+  //   md: '1px 1px 3px rgba(0, 0, 0, .25)',
+  //   xl: '5px 5px 3px rgba(0, 0, 0, .25)',
+  // },
 
-  headings: {
-    fontFamily: 'Roboto, sans-serif',
-  },
+  // headings: {
+  //   fontFamily: 'Roboto, sans-serif',
+  // },
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <head>
-        <ColorSchemeScript defaultColorScheme="light" />
+        {/* <ColorSchemeScript defaultColorScheme="light" /> */}
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
-          <Notifications />
           <HeaderMenu />
           {children}
+          <Footer />
         </MantineProvider>
       </body>
     </html>
