@@ -282,7 +282,7 @@ export default function QuestionsPage() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Container>
-            <Button fullWidth variant="filled" size="lg" color="blue">記録を保存（ログイン/新規登録）</Button>
+            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button}>記録を保存（ログイン/新規登録）</Button>
           </Container>
         </div>
       ):(
@@ -350,7 +350,7 @@ export default function QuestionsPage() {
                     })}
                   </SimpleGrid>
                 </Container>
-                <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => setIsQuestionScreen(false)}>解答解説を見る</Button>
+                <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => setIsQuestionScreen(false)} className={classes.button}>解答解説を見る</Button>
               </Container>
             )}
           </div>
@@ -383,7 +383,7 @@ export default function QuestionsPage() {
                   <Container size={660} p={0}>
                     <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.commentary}</Text>
                   </Container>
-                  <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()}>次の問題へ</Button>
+                  <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
             )}
           </div>
