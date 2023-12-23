@@ -18,11 +18,14 @@
     "@next/mdx": "^14.0.4",
     "@tabler/icons-react": "^2.44.0",
     "@types/mdx": "^2.0.10",
+    "katex": "^0.16.9",
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4.12.0",
+    "rehype-katex": "^7.0.0",
     "remark-gfm": "^4.0.0",
+    "remark-math": "^6.0.0",
     "tabler-icons-react": "^1.56.0"
   },
   "devDependencies": {

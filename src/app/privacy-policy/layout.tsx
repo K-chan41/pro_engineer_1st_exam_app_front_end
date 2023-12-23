@@ -7,7 +7,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Container size={700} className={classes.wrapper}>
         <article className="prose prose-xl">{children}</article>
       </Container>
-    
     </>
   );
 }
