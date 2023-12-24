@@ -145,7 +145,7 @@ export default function Home() {
             </Tabs.Panel>
           </Suspense>
         </Tabs >
-        <Button fullWidth variant="filled" size="lg" color="blue" onClick={navigateToQuestions}>出題開始 (合計{totalQuestions}問)</Button>
+        <Button fullWidth variant="filled" size="lg" color="blue" onClick={navigateToQuestions} className={classes.button}>出題開始 (合計{totalQuestions}問)</Button>
       </Container>
       <Notifications />
     </>

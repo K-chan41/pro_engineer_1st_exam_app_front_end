@@ -6,6 +6,7 @@ import './globals.css';
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
 import '@mantine/notifications/styles.css';
+import Head from 'next/head';
 
 // import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
@@ -59,9 +60,14 @@ const theme = createTheme({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
-      <head>
-        {/* <ColorSchemeScript defaultColorScheme="light" /> */}
-      </head>
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+          integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+          crossOrigin="anonymous"
+        />
+      </Head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
           <HeaderMenu />

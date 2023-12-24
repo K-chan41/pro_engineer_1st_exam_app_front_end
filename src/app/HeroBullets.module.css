@@ -57,3 +57,7 @@
 .group {
   flex-direction: column;
 }
+
+.button {
+  margin-top: rem(90px);
+}

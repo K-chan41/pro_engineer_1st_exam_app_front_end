@@ -77,3 +77,7 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.button {
+  margin-top: rem(90px);
+}
