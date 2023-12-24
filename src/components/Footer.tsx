@@ -7,7 +7,7 @@ import classes from './Footer.module.css';
 const links = [
   { link: '/rules', label: '利用規約' },
   { link: '/privacy-policy', label: 'プライバシーポリシー' },
-  { link: '#', label: 'お問い合わせ' },
+  { link: '/contact', label: 'お問い合わせ' },
 ];
 
 export function Footer() {
