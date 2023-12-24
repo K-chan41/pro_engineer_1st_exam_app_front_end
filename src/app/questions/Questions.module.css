@@ -42,6 +42,7 @@
 .indexColor {
   color: var(--mantine-color-blue-light-color);
   font-weight: 500;
+  margin-right: 10px;
 }
 
 .detailContainer {
@@ -53,10 +54,9 @@
   font-size: var(--mantine-font-size-xs);
 }
 
-/* .choice {
-  margin-top: var(--mantine-spacing-xs);
-  margin-bottom: var(--mantine-spacing-md);
-} */
+.choice {
+  display: flex;
+}
 
 .choiceButton {
   height: 10em;

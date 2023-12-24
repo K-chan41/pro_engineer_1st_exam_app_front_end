@@ -7,6 +7,8 @@ import { Notifications, notifications } from '@mantine/notifications';
 import { CiCircleCheck, CiCircleRemove, CiCircleMinus } from "react-icons/ci";
 import { convertToJapaneseEra } from '../../components/utils';
 import classes from './Questions.module.css';
+import { marked } from 'marked';
+import katex from 'katex';
 
 interface QuestionAttributes {
   number: number;
@@ -174,6 +176,35 @@ export default function QuestionsPage() {
     }
   }, [searchParams]);
 
+  const renderMarkdownAndLatex = async (markdownText) => {
+    // 1. LaTeX数式のレンダリング
+    let latexProcessedText = markdownText.replace(/\\\((.*?)\\\)/g, (match, formula) => {
+      return katex.renderToString(formula, { throwOnError: false, displayMode: false });
+    }).replace(/\\\[(.*?)\\\]/g, (match, formula) => {
+      return katex.renderToString(formula, { throwOnError: false, displayMode: true });
+    });
+  
+    // 2. Markdownのレンダリング
+    return marked(latexProcessedText);
+  };
+  
+  const MyComponent = ({ content }) => {
+    const [renderedContent, setRenderedContent] = useState('');
+  
+    useEffect(() => {
+      const renderContent = async () => {
+        const html = await renderMarkdownAndLatex(content);
+        setRenderedContent(html);
+      };
+  
+      renderContent();
+    }, [content]);
+  
+    // 3. 結果の表示
+    return <div dangerouslySetInnerHTML={{ __html: renderedContent }} />;
+  };
+  
+
   // 解答を保存して解説に遷移する関数
   function handleAnswer(choiceId, choicedIndex, questionId) {
     const isCorrect = questions[currentQuestionIndex].attributes.correct_answer_no == choicedIndex;
@@ -262,6 +293,12 @@ export default function QuestionsPage() {
 
   return (
     <>
+      <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+          integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+          crossOrigin="anonymous"
+      />
       <Notifications containerWidth={800} notificationMaxHeight={800} position="top-center" />
       {isResultScreen ? (
         <div>
@@ -298,7 +335,7 @@ export default function QuestionsPage() {
                   <Text className={classes.supTitle}>第{currentQuestionIndex + 1}問</Text>
 
                 <Container size={660} p={0}>
-                  <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.content}</Text>
+                  <Text component="div" c="dimmed" className={classes.description}><MyComponent content={currentQuestion.attributes.content} /></Text>
                 </Container>
 
                 <Container size={660} p={0}>
@@ -311,12 +348,12 @@ export default function QuestionsPage() {
                 </Container>
 
                 <Container size={660} p={0}>
-                  <SimpleGrid cols={1} spacing={0} className={classes.choice}>
+                  <SimpleGrid cols={1} spacing={0}>
                     {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
                       const choice = choices.find(c => c.id === choiceRelation.id);
                       return (
-                        <Text key={choice.id} c="dimmed">
-                          <span className={classes.indexColor}>{index + 1}.  </span>  {choice.attributes.content}
+                        <Text component="div" key={choice.id} c="dimmed" className={classes.choice}>
+                          <span className={classes.indexColor}>{index + 1}. {"  "}</span>  <MyComponent content={choice.attributes.content} />
                         </Text>
                       );
                     })}
@@ -381,7 +418,7 @@ export default function QuestionsPage() {
                 </Container>
                   <Text className={classes.supTitle}>解説</Text>
                   <Container size={660} p={0}>
-                    <Text c="dimmed" className={classes.description}>{currentQuestion.attributes.commentary}</Text>
+                    <Text component="div" c="dimmed" className={classes.description}><MyComponent content={currentQuestion.attributes.commentary} /></Text>
                   </Container>
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
