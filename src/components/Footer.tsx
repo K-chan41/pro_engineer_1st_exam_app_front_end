@@ -5,8 +5,8 @@ import { IconBrandX, IconBrandGithub, IconCurrencyQuetzal } from '@tabler/icons-
 import classes from './Footer.module.css';
 
 const links = [
-  { link: '#', label: '利用規約' },
-  { link: '#', label: 'プライバシーポリシー' },
+  { link: '/rules', label: '利用規約' },
+  { link: '/privacy-policy', label: 'プライバシーポリシー' },
   { link: '#', label: 'お問い合わせ' },
 ];
 
@@ -17,7 +17,7 @@ export function Footer() {
       key={link.label}
       href={link.link}
       lh={1}
-      onClick={(event) => event.preventDefault()}
+      // onClick={(event) => event.preventDefault()}
       size="sm"
     >
       {link.label}
