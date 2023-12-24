@@ -339,9 +339,9 @@ export default function QuestionsPage() {
                 </Container>
 
                 <Container size={660} p={0}>
-                  {currentQuestion.attributes.content.question_img_src && 
+                  {currentQuestion.attributes.question_img_src && 
                     <Image
-                      src={`http://localhost:4000/images/questions/${currentQuestion.attributes.content.question_img_src}.png`}
+                      src={`http://localhost:4000/images/questions/${currentQuestion.attributes.question_img_src}.png`}
                       alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel.attributes.number}-${currentQuestion.attributes.number}`}
                     />
                   }
@@ -419,6 +419,14 @@ export default function QuestionsPage() {
                   <Text className={classes.supTitle}>解説</Text>
                   <Container size={660} p={0}>
                     <Text component="div" c="dimmed" className={classes.description}><MyComponent content={currentQuestion.attributes.commentary} /></Text>
+                  </Container>
+                  <Container size={660} p={0}>
+                  {currentQuestion.attributes.answer_img_src && 
+                    <Image
+                      src={`http://localhost:4000/images/questions/${currentQuestion.attributes.answer_img_src}.png`}
+                      alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel.attributes.number}-${currentQuestion.attributes.number} answer`}
+                    />
+                  }
                   </Container>
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
