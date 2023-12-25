@@ -22,6 +22,7 @@
     "katex": "^0.16.9",
     "marked": "^11.1.0",
     "next": "14.0.3",
+    "nodemailer": "^6.9.7",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4.12.0",
