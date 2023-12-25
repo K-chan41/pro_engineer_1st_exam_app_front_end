@@ -1,20 +1,9 @@
 'use client';
 
-import { TextInput, Textarea, SimpleGrid, Group, Title, Button } from '@mantine/core';
+import { Container, TextInput, Textarea, SimpleGrid, Group, Title, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
-
-import React from "react";
-// import { SubmitHandler, useForm } from "react-hook-form";
-// import * as yup from 'yup'
-// import { yupResolver } from '@hookform/resolvers/yup'
-// import { useRouter } from "next/router";
-
-// フォームの型
-type ContactForm = {
-  name: string
-  email: string
-  message: string
-};
+import React from 'react';
+import classes from './contact.module.css';
 
 export default function Contact() {
   const form = useForm({
@@ -24,89 +13,70 @@ export default function Contact() {
       message: '',
     },
     validate: {
-      name: (value) => value.trim().length < 2,
-      email: (value) => !/^\S+@\S+$/.test(value),
-      subject: (value) => value.trim().length === 0,
+      name: (value) => (value.trim().length < 2 ? '名前は2文字以上で入力してください' : null),
+      email: (value) => (!/^\S+@\S+$/.test(value) ? '有効なメールアドレスを入力してください' : null),
+      message: (value) => (value.trim().length === 0 ? 'メッセージを入力してください' : null),
     },
   });
 
-  // フォーム送信時の処理（バリデーションOKな時に実行される）
-  const registerUser = async event => {
-    event.preventDefault()
-
+  // フォーム送信時の処理
+  const registerUser = async (values) => {
     const res = await fetch('/api/send', {
-      body: JSON.stringify({
-        email: event.target.email.value,
-        message: event.target.message.value
-      }),
+      body: JSON.stringify(values),
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'POST'
-    })
+    });
 
-    const result = await res.json()
-    if (response.status === 200) {
-      router.push("/thanks");
+    const result = await res.json();
+    if (res.status === 200) {
+      // リダイレクト先のページへ
+      // router.push("/thanks");
+      alert("送信が完了しました！");
     } else {
       alert("正常に送信できませんでした");
-    };
-  }
+    }
+  };
 
   return (
     <>
-      <form onSubmit={registerUser}>
-        <Title
-          order={2}
-          size="h1"
-          style={{ fontFamily: 'Greycliff CF, var(--mantine-font-family)' }}
-          fw={900}
-          ta="center"
-        >
-          Get in touch
-        </Title>
+      <Container size={700} className={classes.wrapper}>
+        <form onSubmit={form.onSubmit(registerUser)}>
+          <Title order={2} size="h3" fw={900} ta="center">
+            お問い合わせ
+          </Title>
 
-        <SimpleGrid cols={{ base: 1, sm: 2 }} mt="xl">
-          <TextInput
-            label="お名前"
-            placeholder="お名前"
-            name="name"
-            variant="filled"
-            {...register('name')}
-            error={'name' in errors}
-            helperText={errors.name?.message}
+          <SimpleGrid cols={{ base: 1, sm: 2 }} mt="xl">
+            <TextInput
+              label="お名前"
+              placeholder="Your name"
+              {...form.getInputProps('name')}
+            />
+            <TextInput
+              label="メールアドレス"
+              placeholder="Your email"
+              {...form.getInputProps('email')}
+            />
+          </SimpleGrid>
+
+          <Textarea
+            mt="md"
+            label="お問い合わせ内容"
+            placeholder="Your message"
+            maxRows={10}
+            minRows={5}
+            autosize
+            {...form.getInputProps('message')}
           />
-          <TextInput
-            label="Email"
-            placeholder="Your email"
-            name="email"
-            variant="filled"
-            {...register('email')}
-            error={'email' in errors}
-            helperText={errors.email?.message}
-          />
-        </SimpleGrid>
 
-        <Textarea
-          mt="md"
-          label="Message"
-          placeholder="Your message"
-          maxRows={10}
-          minRows={5}
-          autosize
-          name="message"
-          variant="filled"
-          {...register('message')}
-          error={'message' in errors}
-          helperText={errors.message?.message}
-        />
-
-        <Group justify="center" mt="xl">
-          <Button type="submit" size="md">
-            Send message
-          </Button>
-        </Group>
-      </form>
+          <Group justify="center" mt="xl">
+            <Button type="submit" size="md">
+              Send message
+            </Button>
+          </Group>
+        </form>
+      </Container>
     </>
-  )
-};
+  );
+}
