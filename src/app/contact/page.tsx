@@ -6,7 +6,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import classes from './contact.module.css';
 
-export default function Contact() {
+const Contact = () => {
   const router = useRouter();
 
   const form = useForm({
@@ -89,3 +89,5 @@ export default function Contact() {
     </>
   );
 }
+
+export default Contact;

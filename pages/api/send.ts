@@ -1,7 +1,7 @@
 import { createTransport } from 'nodemailer';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const transporter = createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -55,3 +55,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     success: true,
   });
 };
+
+export default handler;
