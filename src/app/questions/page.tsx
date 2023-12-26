@@ -342,7 +342,7 @@ export default function QuestionsPage() {
                   {currentQuestion.attributes.question_img_src && 
                     <Image
                       src={`http://localhost:4000/images/questions/${currentQuestion.attributes.question_img_src}.png`}
-                      alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel.attributes.number}-${currentQuestion.attributes.number}`}
+                      alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel && currentLabel.attributes.number}-${currentQuestion.attributes.number}`}
                     />
                   }
                 </Container>
