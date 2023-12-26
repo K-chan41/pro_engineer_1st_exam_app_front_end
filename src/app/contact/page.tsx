@@ -3,9 +3,12 @@
 import { Container, TextInput, Textarea, SimpleGrid, Group, Title, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import classes from './contact.module.css';
 
 export default function Contact() {
+  const router = useRouter();
+
   const form = useForm({
     initialValues: {
       name: '',
@@ -19,20 +22,26 @@ export default function Contact() {
     },
   });
 
+  const handleSubmit = (values: { name: string; email: string; message: string; }) => {
+    console.log(values);
+    registerUser(values);
+  };
+
   // フォーム送信時の処理
   const registerUser = async (values) => {
-    const res = await fetch('/api/send', {
-      body: JSON.stringify(values),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    });
+  const res = await fetch('/api/send', {
+  body: JSON.stringify(values),
+  headers: {
+    Accept: "application/json", 
+    'Content-Type': 'application/json'
+  },
+  method: 'POST'
+  });
 
-    const result = await res.json();
+  const result = await res.json();
     if (res.status === 200) {
       // リダイレクト先のページへ
-      // router.push("/thanks");
+      router.push("/");
       alert("送信が完了しました！");
     } else {
       alert("正常に送信できませんでした");
@@ -42,7 +51,7 @@ export default function Contact() {
   return (
     <>
       <Container size={700} className={classes.wrapper}>
-        <form onSubmit={form.onSubmit(registerUser)}>
+      <form onSubmit={form.onSubmit((values) => {handleSubmit(values);})}>
           <Title order={2} size="h3" fw={900} ta="center">
             お問い合わせ
           </Title>

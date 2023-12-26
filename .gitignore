@@ -27,6 +27,10 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+.env.development    # 開発環境の環境変数
+.env.production     # 本番環境の環境変数
+.env.test           # テスト環境の環境変数
 
 # vercel
 .vercel
