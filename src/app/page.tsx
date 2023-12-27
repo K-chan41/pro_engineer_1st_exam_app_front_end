@@ -22,7 +22,10 @@ type Subject = {
 };
 
 export default function Home() {
-  const [subjects, setSubjects] = useState({ basic_subject: [], aptitude_subject: [] });
+  const [subjects, setSubjects] = useState<{ basic_subject: Subject[], aptitude_subject: Subject[] }>({
+    basic_subject: [], 
+    aptitude_subject: []
+  });
   const topImage = 'top-image.svg';
   const iconStyle = { width: rem(12), height: rem(12) };
 
@@ -43,7 +46,7 @@ export default function Home() {
         setSubjects({ basic_subject: basic, aptitude_subject: aptitude });
       });
   }, []);
-  
+
   const getSubjectDisplayName = (exam_subject: 'basic_subject' | 'aptitude_subject') => {
     if (exam_subject === 'basic_subject') {
       return '技術士第一次試験問題 [基礎科目] 1郡〜5郡';
@@ -52,12 +55,12 @@ export default function Home() {
     }
     return ''; // 予期しない値の場合
   };
-  
+
   // questions画面に選択したsubject_idをクレリパラメータとして送る
   const router = useRouter();
-  const [selectedSubjectIds, setSelectedSubjectIds] = useState([]);
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
 
-  const handleSubjectChange = (subjectId) => {
+  const handleSubjectChange = (subjectId: string) => {
     setSelectedSubjectIds(prevSelectedIds => {
       if (prevSelectedIds.includes(subjectId)) {
         // すでに選択されている場合は削除
@@ -107,7 +110,7 @@ export default function Home() {
         </div>
       </Container>
       <Container>
-        <Tabs radius="md" defaultValue="basic_subject" pd="lg">
+        <Tabs radius="md" defaultValue="basic_subject">
           <Tabs.List className={classes.tabs_list}>
             <Tabs.Tab value="basic_subject" leftSection={<Ballpen size={32} strokeWidth={2} color={'black'}/>}>
               基礎科目

@@ -123,7 +123,24 @@ interface Label {
 
 interface ApiResponse {
   data: Array<Question | Choice | Label>;
+  included: Array<any>; 
 }
+
+interface MyComponentProps {
+  content: string;
+}
+
+interface UserAnswer {
+  choiceId: string;
+  choicedIndex: number;
+  isCorrect: boolean;
+  answered: boolean;
+}
+
+type UserAnswers = {
+  [questionId: string]: UserAnswer;
+};
+
 
 const getSubjectDisplayName = (exam_subject: 'basic_subject' | 'aptitude_subject') => {
   if (exam_subject === 'basic_subject') {
@@ -141,7 +158,7 @@ export default function QuestionsPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
 
-  const [userAnswers, setUserAnswers] = useState({}); // ユーザーの解答を管理するための状態
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0); //　正当数カウント
 
@@ -149,8 +166,9 @@ export default function QuestionsPage() {
   const [isResultScreen, setIsResultScreen] = useState(false); // 結果画面への切り替え
 
   useEffect(() => {
-    const subjectIds = searchParams.getAll('subject_ids[]');
-    // console.log(subjectIds);
+    if (searchParams) {
+      const subjectIds = searchParams.getAll('subject_ids[]');
+      // console.log(subjectIds);
 
     if (subjectIds) {
       const query = Array.isArray(subjectIds)
@@ -173,14 +191,15 @@ export default function QuestionsPage() {
         .catch(error => {
           console.error('Error fetching data:', error);
         });
+      }
     }
   }, [searchParams]);
 
-  const renderMarkdownAndLatex = async (markdownText) => {
+  const renderMarkdownAndLatex = async (markdownText: string) => {
     // 1. LaTeX数式のレンダリング
     let latexProcessedText = markdownText.replace(/\\\((.*?)\\\)/g, (match, formula) => {
       return katex.renderToString(formula, { throwOnError: false, displayMode: false });
-    }).replace(/\\\[(.*?)\\\]/g, (match, formula) => {
+    }).replace(/\\\[(.*?)\\\]/g, (match: any, formula: string) => {
       return katex.renderToString(formula, { throwOnError: false, displayMode: true });
     });
   
@@ -188,7 +207,7 @@ export default function QuestionsPage() {
     return marked(latexProcessedText);
   };
   
-  const MyComponent = ({ content }) => {
+  const MyComponent = ({ content }: MyComponentProps) => {
     const [renderedContent, setRenderedContent] = useState('');
   
     useEffect(() => {
@@ -206,7 +225,7 @@ export default function QuestionsPage() {
   
 
   // 解答を保存して解説に遷移する関数
-  function handleAnswer(choiceId, choicedIndex, questionId) {
+  function handleAnswer(choiceId: string, choicedIndex: number, questionId: string) {
     const isCorrect = questions[currentQuestionIndex].attributes.correct_answer_no == choicedIndex;
 
     // すでに解答されているかどうかをチェック
@@ -225,7 +244,7 @@ export default function QuestionsPage() {
     // アニメーション表示のためのロジックをここに記述
     if(isCorrect){
       notifications.show({
-        id: questionId,
+        id: questionId.toString(),
         autoClose: 1000,
         title: "正解!",
         message: 'いい調子!',
@@ -235,7 +254,7 @@ export default function QuestionsPage() {
       });
     } else {
       notifications.show({
-        id: questionId,
+        id: questionId.toString(),
         autoClose: 1000,
         title: "不正解",
         message: '残念!',
@@ -257,7 +276,7 @@ export default function QuestionsPage() {
 
   // 問題画面に戻る関数
   function backToQusetion(){
-    setIsQuestionScreen(ture);
+    setIsQuestionScreen(true);
   }
 
   // 次の問題画面へ
@@ -342,7 +361,11 @@ export default function QuestionsPage() {
                   {currentQuestion.attributes.question_img_src && 
                     <Image
                       src={`http://localhost:4000/images/questions/${currentQuestion.attributes.question_img_src}.png`}
-                      alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel && currentLabel.attributes.number}-${currentQuestion.attributes.number}`}
+                      alt={`${
+                        currentSubject 
+                        ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject === "basic_subject" ? "Ⅰ" : ""}${currentSubject.attributes.exam_subject === "aptitude_subject" ? "Ⅱ" : ""}-${currentLabel ? currentLabel.attributes.number : ""}-${currentQuestion.attributes.number}`
+                        : ""
+                      }`}
                     />
                   }
                 </Container>
@@ -351,6 +374,9 @@ export default function QuestionsPage() {
                   <SimpleGrid cols={1} spacing={0}>
                     {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
                       const choice = choices.find(c => c.id === choiceRelation.id);
+                      if (!choice) {
+                        return null; // choiceが見つからない場合は何もレンダリングしない
+                      }
                       return (
                         <Text component="div" key={choice.id} c="dimmed" className={classes.choice}>
                           <span className={classes.indexColor}>{index + 1}. {"  "}</span>  <MyComponent content={choice.attributes.content} />
@@ -362,10 +388,20 @@ export default function QuestionsPage() {
 
                 <Container size={660} p={0} className={classes.detailContainer}>
                   {currentSubject && (
-                    <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>
+                      {convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}
+                    </Text>
                   )}
                   {currentLabel && (
-                    <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」
+                      {currentSubject && (
+                        <>
+                          {currentSubject.attributes.exam_subject === "basic_subject" && "Ⅰ"}
+                          {currentSubject.attributes.exam_subject === "aptitude_subject" && "Ⅱ"}
+                        </>
+                      )}
+                      -{currentLabel.attributes.number}-{currentQuestion.attributes.number}
+                    </Text>
                   )}
                   <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
                 </Container>
@@ -374,6 +410,9 @@ export default function QuestionsPage() {
                   <SimpleGrid cols={5}>
                     {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
                       const choice = choices.find(c => c.id === choiceRelation.id);
+                      if (!choice) {
+                        return null; // 何も表示しない場合
+                      }
                       return (
                         <Button
                           key={choice.id}
@@ -409,10 +448,20 @@ export default function QuestionsPage() {
                 </Group>
                 <Container size={660} p={0} className={classes.detailContainer}>
                   {currentSubject && (
-                    <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>{convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject)}</Text>
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentSubject.id}>
+                      {convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 {getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}
+                    </Text>
                   )}
                   {currentLabel && (
-                    <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」{currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}{currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-{currentLabel.attributes.number}-{currentQuestion.attributes.number}</Text>
+                    <Text c="dimmed" ta="right" className={classes.detail} key={currentLabel.id}>「{currentLabel.attributes.title}」
+                      {currentSubject && (
+                        <>
+                          {currentSubject.attributes.exam_subject === "basic_subject" && "Ⅰ"}
+                          {currentSubject.attributes.exam_subject === "aptitude_subject" && "Ⅱ"}
+                        </>
+                      )}
+                      -{currentLabel.attributes.number}-{currentQuestion.attributes.number}
+                    </Text>
                   )}
                   <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
                 </Container>
@@ -423,9 +472,13 @@ export default function QuestionsPage() {
                   <Container size={660} p={0}>
                   {currentQuestion.attributes.answer_img_src && 
                     <Image
-                      src={`http://localhost:4000/images/questions/${currentQuestion.attributes.answer_img_src}.png`}
-                      alt={`${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject == "basic_subject" && "Ⅰ"}${currentSubject.attributes.exam_subject == "aptitude_subject" && "Ⅱ"}-${currentLabel.attributes.number}-${currentQuestion.attributes.number} answer`}
-                    />
+                    src={`http://localhost:4000/images/questions/${currentQuestion.attributes.answer_img_src}.png`}
+                    alt={`${
+                      currentSubject 
+                      ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${currentSubject.attributes.exam_subject === "basic_subject" ? "Ⅰ" : ""}${currentSubject.attributes.exam_subject === "aptitude_subject" ? "Ⅱ" : ""}-${currentLabel ? currentLabel.attributes.number : ""}-${currentQuestion.attributes.number}-answer`
+                      : ""
+                    }`}
+                  />
                   }
                   </Container>
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
