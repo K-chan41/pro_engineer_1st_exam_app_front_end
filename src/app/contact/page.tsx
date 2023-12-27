@@ -6,6 +6,12 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import classes from './contact.module.css';
 
+type FormValues = {
+  name: string;
+  email: string;
+  message: string;
+};
+
 const Contact = () => {
   const router = useRouter();
 
@@ -22,7 +28,7 @@ const Contact = () => {
     },
   });
 
-  const handleSubmit = (values: { name: string; email: string; message: string; }) => {
+  const handleSubmit = (values: FormValues) => {
     console.log(values);
     registerUser(values);
   };
