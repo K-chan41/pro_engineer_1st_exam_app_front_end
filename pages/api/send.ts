@@ -1,8 +1,8 @@
-import { createTransport } from 'nodemailer';
+import nodemailer from 'nodemailer';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const transporter = createTransport({
+  const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
