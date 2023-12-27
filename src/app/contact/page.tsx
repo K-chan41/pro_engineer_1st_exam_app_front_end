@@ -34,7 +34,7 @@ const Contact = () => {
   };
 
   // フォーム送信時の処理
-  const registerUser = async (values) => {
+  const registerUser = async (values: FormValues) => {
   const res = await fetch('/api/send', {
   body: JSON.stringify(values),
   headers: {
