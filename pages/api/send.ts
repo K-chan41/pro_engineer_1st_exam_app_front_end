@@ -53,19 +53,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     `,
   };
 
-  transporter.sendMail(msgToManager, function (err: any, info: any) {
-    if(err) console.log(err);
-    else console.log(info);
-  })
-
-  transporter.sendMail(msgToUser, function (err: any, info: any) {
-    if(err) console.log(err);
-    else console.log(info);
-  })
-
-  res.status(200).json({
-    success: true,
+  transporter.sendMail(msgToManager, function (err, info) {
+    if (err) {
+      console.log("Error occurred: ", err);
+    } else {
+      console.log("Message sent: ", info);
+    }
   });
-};
+  
+  transporter.sendMail(msgToUser, function (err, info) {
+    if (err) {
+      console.log("Error occurred: ", err);
+    } else {
+      console.log("Message sent: ", info);
+    }
+  });
 
 export default handler;
