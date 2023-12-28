@@ -3,14 +3,25 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: "gmail",
     auth: {
+      type: "OAuth2",
       user: process.env.GMAILUSER,
-      pass: process.env.GMAILPASSWORD,
+      clientId: process.env.CLIENTID,
+      clientSecret: process.env.CLIENTSECRET,
+      refreshToken: process.env.REFRESHTOKEN,
     },
   });
+
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.gmail.com',
+  //   port: 465,
+  //   secure: true,
+  //   auth: {
+  //     user: process.env.GMAILUSER,
+  //     pass: process.env.GMAILPASSWORD,
+  //   },
+  // });
 
   const msgToManager = {
     to: 'proengineer1stexam@gmail.com',
