@@ -11,7 +11,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       clientSecret: process.env.CLIENTSECRET,
       refreshToken: process.env.REFRESHTOKEN,
     },
-    debug: true,
+    // debug: true,
   });
 
   // const transporter = nodemailer.createTransport({
