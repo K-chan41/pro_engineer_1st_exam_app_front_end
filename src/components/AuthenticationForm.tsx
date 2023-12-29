@@ -1,3 +1,5 @@
+'use client';
+
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import {
@@ -13,6 +15,8 @@ import {
   Anchor,
   Stack,
 } from '@mantine/core';
+import { useAuth } from './AuthContext';
+import { notifications } from '@mantine/notifications';
 
 export function AuthenticationForm(props: PaperProps) {
   const [type, toggle] = useToggle(['login', 'register']);
@@ -31,15 +35,58 @@ export function AuthenticationForm(props: PaperProps) {
     },
   });
 
+  const { auth, login } = useAuth();
+  const currentUser = auth.user;
+
+  const handleSubmit = async (values) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/v1/registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user: {
+            name: values.name,
+            email: values.email,
+            password: values.password,
+          }
+        })
+      });
+  
+      if (response.ok) {
+        // 登録成功時の処理
+        const data = await response.json();
+        const user = data.data.attributes;
+        const token = response.headers.get('AccessToken');
+        login(token, user);
+        console.log('登録成功！');
+        console.log(token, user);
+        notifications.show({
+          title: '注意',
+          message: '少なくとも一つの年度を選択してください。',
+          color: 'red',
+        })
+      } else {
+        // エラー処理
+        console.error('登録失敗');
+      }
+    } catch (error) {
+      console.error('エラーが発生しました', error);
+    }
+  };
+
   return (
-    // <Paper radius="md" p="xl" withBorder {...props}>
-    //   <Text size="lg" fw={500}>
-    //     Welcome to Mantine, {type} with
-    //   </Text>
+  <>
+    <div>
+      {currentUser ? (
+        <p>ようこそ、{currentUser.name}さん</p>
+      ) : (
+        <p>ゲストユーザーとしてアクセスしています。</p>
+      )}
+    </div>
 
-    //   <Divider label="Or continue with email" labelPosition="center" my="lg" />
-
-      <form onSubmit={form.onSubmit(() => {})}>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
           {type === 'register' && (
             <TextInput
@@ -93,6 +140,6 @@ export function AuthenticationForm(props: PaperProps) {
           </Button>
         </Group>
       </form>
-    // </Paper>
+    </>
   );
 }
