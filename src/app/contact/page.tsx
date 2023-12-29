@@ -87,7 +87,7 @@ const Contact = () => {
 
           <Group justify="center" mt="xl">
             <Button type="submit" size="md">
-              Send message
+              送信する
             </Button>
           </Group>
         </form>
