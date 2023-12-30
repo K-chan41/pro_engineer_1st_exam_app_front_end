@@ -7,11 +7,15 @@ import classes from './HeaderMenu.module.css';
 import Link from 'next/link';
 import { HeaderIcon } from './HeaderIcon';
 import { AuthenticationForm } from './AuthenticationForm'
+import { useAuth } from './AuthContext';
 
 export function HeaderMenu() {
   const [opened, { open, close }] = useDisclosure(false);
   const logoSrc = 'header-logo.png';
   const logoText = '技術士1次試験 基礎•適正科目 過去問ドリル'; 
+
+  const { auth } = useAuth();
+  const currentUser = auth.user;
 
   return (
     <header className={classes.header}>
@@ -24,24 +28,24 @@ export function HeaderMenu() {
             </Center>
           </Link>
           <Group gap={5} visibleFrom="sm">
-            <Drawer opened={opened} onClose={close} title="ログイン / 新規登録" position="right">
-              <AuthenticationForm/>
-            </Drawer>
-            <Button onClick={open} variant="subtle" color="gray">ログイン</Button>
-            {/* <Link key='/login' href='/login' className={classes.link}>
-              ログイン
-            </Link> */}
-            <HeaderIcon />
+            {currentUser ? (
+              <HeaderIcon />
+            ) : (
+              <>
+                <Drawer opened={opened} onClose={close} title="ログイン / 新規登録" position="right">
+                  <AuthenticationForm/>
+                </Drawer>
+                <Button onClick={open} variant="subtle" color="gray">ログイン</Button>
+              </>
+            )}
           </Group>
-            <Burger opened={opened} onClick={open} size="sm" hiddenFrom="sm" />
-            {/* <Drawer offset={8} radius="md" opened={opened} onClose={close} title="Authentication" position="top" size="18%">
-              <Link key='/register' href='/register' className={classes.link}>
-                新規登録
-              </Link>
-              <Link key='/login' href='/login' className={classes.link}>
-                ログイン
-              </Link>
-            </Drawer> */}
+            {currentUser ? (
+              <Container size="sm" hiddenFrom="sm">
+                <HeaderIcon />
+              </Container>
+            ):(
+              <Burger opened={opened} onClick={open} size="sm" hiddenFrom="sm" />
+            )}
         </div>
       </Container>
     </header>

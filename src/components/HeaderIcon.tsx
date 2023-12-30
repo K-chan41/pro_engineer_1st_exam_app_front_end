@@ -21,6 +21,7 @@ import {
   IconSwitchHorizontal,
   IconChevronDown,
 } from '@tabler/icons-react';
+import { useAuth } from './AuthContext';
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import classes from './HeaderTabs.module.css';
 
@@ -45,6 +46,8 @@ export function HeaderIcon() {
   const theme = useMantineTheme();
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const { auth, logout } = useAuth();
+  const currentUser = auth.user;
 
   return (
     <Group justify="space-between">
