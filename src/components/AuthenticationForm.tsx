@@ -18,6 +18,12 @@ import {
 import { useAuth } from './AuthContext';
 import { notifications } from '@mantine/notifications';
 
+interface FormValues {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export function AuthenticationForm(props: PaperProps) {
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({
@@ -29,18 +35,19 @@ export function AuthenticationForm(props: PaperProps) {
     },
 
     validate: {
-      name: (val) => (val.trim().length < 2 ? '名前は2文字以上で入力してください' : null),
+      name: (val) => type === 'register' && (val.trim().length < 2 ? '名前は2文字以上で入力してください' : null),
       email: (val) => (/^\S+@\S+$/.test(val) ? null : '有効なメールアドレスを入力してください'),
-      password: (val) => (val.length <= 6 ? 'パスワードには少なくとも6文字を含める必要があります' : null),
+      password: (val) => (val.length < 6 ? 'パスワードには少なくとも6文字を含める必要があります' : null),
     },
   });
 
   const { auth, login } = useAuth();
   const currentUser = auth.user;
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: FormValues) => {
+    const endpoint = type === 'register' ? '/api/v1/registration' : '/api/v1/authentication';
     try {
-      const response = await fetch('http://localhost:4000/api/v1/registration', {
+      const response = await fetch(`http://localhost:4000${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -53,23 +60,26 @@ export function AuthenticationForm(props: PaperProps) {
           }
         })
       });
-  
+
       if (response.ok) {
         // 登録成功時の処理
         const data = await response.json();
-        const user = data.data.attributes;
+        const user_name = data.data.attributes.name;
         const token = response.headers.get('AccessToken');
-        login(token, user);
-        console.log('登録成功！');
-        console.log(token, user);
-        notifications.show({
-          title: '注意',
-          message: '少なくとも一つの年度を選択してください。',
-          color: 'red',
-        })
-      } else {
-        // エラー処理
-        console.error('登録失敗');
+
+        if (token) {
+          login(token, user_name);
+          notifications.show({
+            title: '成功！',
+            message: 'ログインできました'
+          });
+        } else {
+          notifications.show({
+            title: '失敗',
+            message: 'ログインできませんでした',
+            color: 'red'
+          });
+        }
       }
     } catch (error) {
       console.error('エラーが発生しました', error);
