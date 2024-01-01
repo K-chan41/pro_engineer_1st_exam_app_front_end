@@ -63,26 +63,31 @@ export function AuthenticationForm(props: PaperProps) {
 
       if (response.ok) {
         // 登録成功時の処理
-        const data = await response.json();
-        const user_name = data.data.attributes.name;
+        const user = await response.json();
         const token = response.headers.get('AccessToken');
 
         if (token) {
-          login(token, user_name);
+          login(token, user);
           notifications.show({
             title: '成功！',
             message: 'ログインできました'
           });
-        } else {
-          notifications.show({
-            title: '失敗',
-            message: 'ログインできませんでした',
-            color: 'red'
-          });
         }
+      } else {
+        const error = await response.json();
+        notifications.show({
+          title: '失敗',
+          message: error.error || 'ログインできませんでした',
+          color: 'red'
+        });
       }
     } catch (error) {
       console.error('エラーが発生しました', error);
+      notifications.show({
+        title: 'エラー',
+        message: '通信エラーが発生しました',
+        color: 'red',
+      });
     }
   };
 

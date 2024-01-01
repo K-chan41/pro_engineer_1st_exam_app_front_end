@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Dispatch, SetStateAction, createContext, useContext, useState, useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
 
 // AuthContext の型定義
 interface AuthContextType {
@@ -50,6 +51,7 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
         if (userInfo) {
           setAuth({ token, isAuthenticated: true, user: userInfo });
         }
+        // console.log(userInfo);
       });
     }
   }, [setAuth]);
@@ -70,22 +72,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log(token, user);
   };
 
-  // ログアウトする関数
-  const logout = async () => {
-    const token = localStorage.getItem('token'); // トークンをローカルストレージから取得
-    if (token) {
-      await fetch('http://localhost:4000/api/v1/authentication', {
+// ログアウトする関数
+const logout = async () => {
+  const token = localStorage.getItem('token'); // トークンをローカルストレージから取得
+  if (token) {
+    try {
+      const response = await fetch('http://localhost:4000/api/v1/authentication', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+
+      if (response.ok) {
+        // ローカルストレージからトークンを削除し、アプリ状態を更新
+        setAuth({ token: null, isAuthenticated: false, user: null });
+        localStorage.removeItem('token');
+        // ログアウト成功の通知
+        notifications.show({
+          title: '成功',
+          message: 'ログアウトしました',
+          color: 'green',
+        });
+      } else {
+        // サーバー側のエラーレスポンスをハンドル
+        const errorData = await response.json();
+        notifications.show({
+          title: '失敗',
+          message: errorData.error || 'ログアウトに失敗しました',
+          color: 'red',
+        });
+      }
+    } catch (error) {
+      // 通信エラーをハンドル
+      console.error('エラーが発生しました', error);
+      notifications.show({
+        title: 'エラー',
+        message: '通信エラーが発生しました',
+        color: 'red',
+      });
     }
-    
-    // ローカルストレージからトークンを削除し、アプリ状態を更新
-    setAuth({ token: null, isAuthenticated: false, user: null });
-    localStorage.removeItem('token');
-  };
+  }
+};
 
   return (
     <AuthContext.Provider value={{ auth, setAuth, login, logout }}>

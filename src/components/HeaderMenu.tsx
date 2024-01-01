@@ -29,7 +29,7 @@ export function HeaderMenu() {
                   <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
                 </Center>
               </Link>
-              <Group gap={5}>
+              <Group gap={1}>
                 <HeaderIcon />
               </Group>
             </div>

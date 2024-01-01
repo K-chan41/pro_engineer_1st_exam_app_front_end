@@ -43,7 +43,6 @@ export function HeaderIcon() {
 
   const { auth, logout } = useAuth();
   const currentUser = auth.user;
-  console.log(currentUser);
 
   const user = {
     name: currentUser.name,
@@ -69,7 +68,7 @@ export function HeaderIcon() {
           <UnstyledButton
             className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
           >
-            <Group gap={7}>
+            <Group gap={3} justify="center">
               <Avatar src={user.image} alt={user.name} radius="xl" size={30} />
               <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
             </Group>

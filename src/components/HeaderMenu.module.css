@@ -21,7 +21,7 @@
   color: var(--mantine-color-dark-9);
 }
 
-.link {
+/* .link {
   display: block;
   line-height: 1;
   padding: rem(8px) rem(12px);
@@ -34,7 +34,7 @@
   @mixin hover {
     background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
   }
-}
+} */
 
 .linkLabel {
   margin-right: rem(5px);
