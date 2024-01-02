@@ -1,6 +1,6 @@
 'use client';
 
-import { Image, Text, Container, Title, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
+import { Image, Text, Container, Checkbox, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Notifications, notifications } from '@mantine/notifications';
@@ -9,6 +9,7 @@ import { convertToJapaneseEra } from '../../components/utils';
 import classes from './Questions.module.css';
 import { marked } from 'marked';
 import katex from 'katex';
+import { Flag } from 'tabler-icons-react';
 
 interface QuestionAttributes {
   number: number;
@@ -157,6 +158,7 @@ export default function QuestionsPage() {
   const [choices, setChoices] = useState<Choice[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
+  const [flagStatuses, setFlagStatuses] = useState({}); 
 
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
@@ -194,6 +196,51 @@ export default function QuestionsPage() {
       }
     }
   }, [searchParams]);
+
+  const handleFlagClick = async (questionId, flagStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        notifications.show({
+          title: '認証',
+          message: 'フラグするにはログイン/新規登録が必要です。',
+          color: 'red',
+        });
+        console.error("ログインが必要です");
+        return;
+      }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      if (flagStatus) {
+        // フラグを追加するAPIリクエスト
+        await fetch(`http://localhost:4000/api/v1/flags`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ question_id: questionId }),
+        });
+      } else {
+        // フラグを削除するAPIリクエスト
+        const response = await fetch(`http://localhost:4000/api/v1/flags/${questionId}`, {
+          method: 'DELETE',
+          headers: headers,
+        });
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+      }
+      setFlagStatuses(prev => ({ ...prev, [questionId]: flagStatus }));
+    } catch (error) {
+      console.error('Error handling flag:', error);
+      notifications.show({
+        title: 'エラー',
+        message: 'フラグの操作に失敗しました。',
+        color: 'red',
+      });
+    }
+  };
+  
 
   const renderMarkdownAndLatex = async (markdownText: string) => {
     // 1. LaTeX数式のレンダリング
@@ -405,7 +452,10 @@ export default function QuestionsPage() {
                   )}
                   <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
                 </Container>
-
+                <Flag
+                  color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                  onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
+                />
                 <Container size={660} p={0} className={classes.buttonContainer}>
                   <SimpleGrid cols={5}>
                     {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
@@ -430,7 +480,7 @@ export default function QuestionsPage() {
               </Container>
             )}
           </div>
-          ) : (
+        ) : (
           <div>
             {currentQuestion && (
               <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
@@ -481,6 +531,10 @@ export default function QuestionsPage() {
                   />
                   }
                   </Container>
+                  <Flag
+                    color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                    onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
+                  />
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
             )}
