@@ -11,6 +11,7 @@ import '@mantine/notifications/styles.css';
 // import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
 import { Footer } from '../components/Footer'
+import { AuthProvider } from '../components/AuthContext';
 
 export const metadata: Metadata = {
   title: {
@@ -71,11 +72,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ColorSchemeScript />
         </head>
         <body>
-          <MantineProvider theme={theme} defaultColorScheme="light">
-            <HeaderMenu />
-            {children}
-            <Footer />
-          </MantineProvider>
+          <AuthProvider>
+            <MantineProvider theme={theme} defaultColorScheme="light">
+              <HeaderMenu />
+              {children}
+              <Footer />
+            </MantineProvider>
+          </AuthProvider>
         </body>
       </html>
     </>

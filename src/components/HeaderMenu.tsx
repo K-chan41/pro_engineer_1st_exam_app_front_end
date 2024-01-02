@@ -1,39 +1,65 @@
 'use client';
 
-import { Menu, Group, Center, Burger, Container, Image, Text } from '@mantine/core';
+import { Modal, Group, Center, Burger, Container, Image, Text, Drawer, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconChevronDown } from '@tabler/icons-react';
 import classes from './HeaderMenu.module.css';
 import Link from 'next/link';
 import { HeaderIcon } from './HeaderIcon';
+import { AuthenticationForm } from './AuthenticationForm';
+import { useAuth } from './AuthContext';
 
 export function HeaderMenu() {
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const logoSrc = 'header-logo.png';
-  const logoText = '技術士1次試験 基礎•適正科目 過去問ドリル'; 
+  const logoText = '技術士1次試験 基礎•適正科目 過去問ドリル';
+
+  const { auth } = useAuth();
+  const currentUser = auth.user;
+
+  if (currentUser) {
+    return (
+      <>
+        <header className={classes.header}>
+          <Container size="md">
+            <div className={classes.inner}>
+              <Link href="/" className={classes.headerLink}>
+                <Center>
+                  <Image src={logoSrc} alt="Logo" h={40} />
+                  <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
+                </Center>
+              </Link>
+              <Group gap={1}>
+                <HeaderIcon />
+              </Group>
+            </div>
+          </Container>
+        </header>
+      </>
+    )
+  };
 
   return (
-    <header className={classes.header}>
-      <Container size="md">
-        <div className={classes.inner}>
-          <Link href="/">
-            <Center>
-                <Image src={logoSrc} alt="Logo" h={40} />
-                <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
-            </Center>
-          </Link>
-          <Group gap={5} visibleFrom="sm">
-            <Link key='/register' href='/register' className={classes.link}>
-              新規登録
+    <>
+      <header className={classes.header}>
+        <Container size="md">
+          <div className={classes.inner}>
+            <Link href="/" className={classes.headerLink}>
+              <Center>
+                  <Image src={logoSrc} alt="Logo" h={40} />
+                  <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
+              </Center>
             </Link>
-            <Link key='/login' href='/login' className={classes.link}>
-              ログイン
-            </Link>
-            <HeaderIcon />
-          </Group>
-          <Burger opened={opened} onClick={toggle} size="sm" hiddenFrom="sm" />
-        </div>
-      </Container>
-    </header>
+            <Group gap={5} visibleFrom="sm">
+              <Drawer opened={opened} onClose={close} title="ログイン / 新規登録" position="right">
+                <AuthenticationForm/>
+              </Drawer>
+              <Button onClick={open} variant="subtle" color="gray">ログイン</Button>
+            </Group>
+              <Burger opened={opened} onClick={open} size="sm" hiddenFrom="sm" />
+          </div>
+        </Container>
+      </header>
+    </>
   );
 }

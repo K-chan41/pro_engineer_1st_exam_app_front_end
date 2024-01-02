@@ -23,12 +23,7 @@ import {
 } from '@tabler/icons-react';
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import classes from './HeaderTabs.module.css';
-
-const user = {
-  name: 'Jane Spoonfighter',
-  email: 'janspoon@fighter.dev',
-  image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
-};
+import { useAuth } from './AuthContext';
 
 const tabs = [
   'Home',
@@ -46,6 +41,19 @@ export function HeaderIcon() {
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
 
+  const { auth, logout } = useAuth();
+  const currentUser = auth.user;
+
+  const user = {
+    name: currentUser.name,
+    email: 'janspoon@fighter.dev',
+    image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
+  };
+
+  const handleLogout = () => {
+    logout(); // ローカルの認証状態をクリア
+  };
+
   return (
     <Group justify="space-between">
       <Menu
@@ -60,7 +68,7 @@ export function HeaderIcon() {
           <UnstyledButton
             className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
           >
-            <Group gap={7}>
+            <Group gap={3} justify="center">
               <Avatar src={user.image} alt={user.name} radius="xl" size={30} />
               <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
             </Group>
@@ -69,84 +77,19 @@ export function HeaderIcon() {
         <Menu.Dropdown>
           <Menu.Item>
             <Text fw={500} size="sm" lh={1} mr={3}>
-                {user.name}
+                {currentUser.data.attributes.name}
             </Text>
           </Menu.Item>
 
           <Menu.Divider />
-          
-          <Menu.Item
-            leftSection={
-              <IconHeart
-                style={{ width: rem(16), height: rem(16) }}
-                color={theme.colors.red[6]}
-                stroke={1.5}
-              />
-            }
-          >
-            Liked posts
-          </Menu.Item>
-          <Menu.Item
-            leftSection={
-              <IconStar
-                style={{ width: rem(16), height: rem(16) }}
-                color={theme.colors.yellow[6]}
-                stroke={1.5}
-              />
-            }
-          >
-            Saved posts
-          </Menu.Item>
-          <Menu.Item
-            leftSection={
-              <IconMessage
-                style={{ width: rem(16), height: rem(16) }}
-                color={theme.colors.blue[6]}
-                stroke={1.5}
-              />
-            }
-          >
-            Your comments
-          </Menu.Item>
 
-          <Menu.Label>Settings</Menu.Label>
-          <Menu.Item
-            leftSection={
-              <IconSettings style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-            }
-          >
-            Account settings
-          </Menu.Item>
-          <Menu.Item
-            leftSection={
-              <IconSwitchHorizontal style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-            }
-          >
-            Change account
-          </Menu.Item>
           <Menu.Item
             leftSection={
               <IconLogout style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
             }
+            onClick={handleLogout}
           >
-            Logout
-          </Menu.Item>
-
-          <Menu.Divider />
-
-          <Menu.Label>Danger zone</Menu.Label>
-          <Menu.Item
-            leftSection={
-              <IconPlayerPause style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-            }
-          >
-            Pause subscription
-          </Menu.Item>
-          <Menu.Item
-            color="red"
-            leftSection={<IconTrash style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
-          >
-            Delete account
+            ログアウト
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

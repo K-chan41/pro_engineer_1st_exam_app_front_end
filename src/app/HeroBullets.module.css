@@ -60,4 +60,7 @@
 
 .button {
   margin-top: rem(90px);
+  @media (max-width: $mantine-breakpoint-md) {
+    margin-top: rem(45px);
+  }
 }
