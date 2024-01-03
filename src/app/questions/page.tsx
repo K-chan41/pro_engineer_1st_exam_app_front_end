@@ -200,7 +200,7 @@ export default function QuestionsPage() {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await fetch(`http://localhost:4000/api/v1/user_info`, {
+        const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -243,14 +243,14 @@ export default function QuestionsPage() {
       };
       if (!flagStatus) {
         // フラグを追加するAPIリクエスト
-        response = await fetch(`http://localhost:4000/api/v1/flags`, {
+        response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/flags`, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({ flag: { question_id: questionId } }),
         });
       } else {
         // フラグを削除するAPIリクエスト
-        response = await fetch(`http://localhost:4000/api/v1/flags/${questionId}`, {
+        response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/flags/${questionId}`, {
           method: 'DELETE',
           headers: headers,
         });

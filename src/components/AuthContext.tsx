@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContextValue);
 
 async function fetchUserInfo(token: string) {
   try {
-    const response = await fetch('http://localhost:4000/api/v1/user_info', {
+    const response = await fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info', {
       method: 'GET', 
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ const logout = async () => {
   const token = localStorage.getItem('token'); // トークンをローカルストレージから取得
   if (token) {
     try {
-      const response = await fetch('http://localhost:4000/api/v1/authentication', {
+      const response = await fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/authentication', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

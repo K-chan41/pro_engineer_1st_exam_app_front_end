@@ -47,7 +47,7 @@ export function AuthenticationForm(props: PaperProps) {
   const handleSubmit = async (values: FormValues) => {
     const endpoint = type === 'register' ? '/api/v1/registration' : '/api/v1/authentication';
     try {
-      const response = await fetch(`http://localhost:4000${endpoint}`, {
+      const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
