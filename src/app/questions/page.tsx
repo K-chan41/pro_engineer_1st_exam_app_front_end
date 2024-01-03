@@ -9,7 +9,7 @@ import { convertToJapaneseEra } from '../../components/utils';
 import classes from './Questions.module.css';
 import { marked } from 'marked';
 import katex from 'katex';
-import { Flag } from 'tabler-icons-react';
+import { IoFlag } from "react-icons/io5";
 
 interface QuestionAttributes {
   number: number;
@@ -193,8 +193,34 @@ export default function QuestionsPage() {
         .catch(error => {
           console.error('Error fetching data:', error);
         });
+    }
+  }
+      // ユーザー情報の取得とフラグの状態設定
+  const fetchUserInfo = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await fetch(`http://localhost:4000/api/v1/user_info`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        const flags = data.included.filter(item => item.type === 'flag');
+
+        // フラグの状態を管理するオブジェクトを初期化
+        const flagStatuses = {};
+        flags.forEach(flag => {
+          flagStatuses[flag.attributes.question_id] = true;
+        });
+
+        // フラグの状態をステートにセット
+        setFlagStatuses(flagStatuses);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
       }
     }
+  };
+
+  fetchUserInfo();
   }, [searchParams]);
 
   const handleFlagClick = async (questionId, flagStatus) => {
@@ -209,28 +235,35 @@ export default function QuestionsPage() {
         console.error("ログインが必要です");
         return;
       }
+
+      let response;
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       };
-      if (flagStatus) {
+      if (!flagStatus) {
         // フラグを追加するAPIリクエスト
-        await fetch(`http://localhost:4000/api/v1/flags`, {
+        response = await fetch(`http://localhost:4000/api/v1/flags`, {
           method: 'POST',
           headers: headers,
-          body: JSON.stringify({ question_id: questionId }),
+          body: JSON.stringify({ flag: { question_id: questionId } }),
         });
       } else {
         // フラグを削除するAPIリクエスト
-        const response = await fetch(`http://localhost:4000/api/v1/flags/${questionId}`, {
+        response = await fetch(`http://localhost:4000/api/v1/flags/${questionId}`, {
           method: 'DELETE',
           headers: headers,
         });
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
       }
-      setFlagStatuses(prev => ({ ...prev, [questionId]: flagStatus }));
+      if (response.ok) {
+        // フラグ状態の更新
+        // console.log('Current flag status:', flagStatuses[questionId]);
+        const updatedFlagStatus = !flagStatuses[questionId];
+        // console.log('Updated flag status:', updatedFlagStatus);
+        setFlagStatuses(prev => ({ ...prev, [questionId]: updatedFlagStatus }));
+      } else {
+        throw new Error(`Error: ${response.status}`);
+      }
     } catch (error) {
       console.error('Error handling flag:', error);
       notifications.show({
@@ -452,10 +485,13 @@ export default function QuestionsPage() {
                   )}
                   <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
                 </Container>
-                <Flag
-                  color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                  onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
-                />
+                <Container size={660} p={0}>
+                  <IoFlag
+                    id={currentQuestion.id + "-flag-question"}
+                    color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                    onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
+                  />
+                </Container>
                 <Container size={660} p={0} className={classes.buttonContainer}>
                   <SimpleGrid cols={5}>
                     {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
@@ -531,10 +567,13 @@ export default function QuestionsPage() {
                   />
                   }
                   </Container>
-                  <Flag
-                    color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                    onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
-                  />
+                  <Container size={660} p={0}>
+                    <IoFlag
+                      id={currentQuestion.id + "-flag-answer"}
+                      color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                      onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
+                    />
+                  </Container>
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
             )}
