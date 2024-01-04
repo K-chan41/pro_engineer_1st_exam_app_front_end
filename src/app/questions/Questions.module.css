@@ -78,6 +78,10 @@
   align-items: center;
 }
 
+.flagIcon {
+  cursor: pointer;
+}
+
 .button {
   margin-top: rem(20px);
 }

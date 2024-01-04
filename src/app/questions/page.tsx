@@ -1,6 +1,6 @@
 'use client';
 
-import { Image, Text, Container, Title, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
+import { Image, Text, Container, Checkbox, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Notifications, notifications } from '@mantine/notifications';
@@ -9,6 +9,7 @@ import { convertToJapaneseEra } from '../../components/utils';
 import classes from './Questions.module.css';
 import { marked } from 'marked';
 import katex from 'katex';
+import { IoFlag } from "react-icons/io5";
 
 interface QuestionAttributes {
   number: number;
@@ -141,6 +142,21 @@ type UserAnswers = {
   [questionId: string]: UserAnswer;
 };
 
+interface IncludedItem {
+  type: string;
+}
+
+interface FlagItem {
+  attributes: {
+    question_id: string;
+    // 他の属性があればここに
+  };
+  // 他のプロパティがあればここに
+}
+
+interface FlagStatuses {
+  [key: string]: boolean;
+}
 
 const getSubjectDisplayName = (exam_subject: 'basic_subject' | 'aptitude_subject') => {
   if (exam_subject === 'basic_subject') {
@@ -157,6 +173,7 @@ export default function QuestionsPage() {
   const [choices, setChoices] = useState<Choice[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
+  const [flagStatuses, setFlagStatuses] = useState<FlagStatuses>({}); 
 
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
@@ -191,9 +208,88 @@ export default function QuestionsPage() {
         .catch(error => {
           console.error('Error fetching data:', error);
         });
+    }
+  }
+      // ユーザー情報の取得とフラグの状態設定
+  const fetchUserInfo = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        const flags = data.included.filter((item: IncludedItem) => item.type === 'flag');
+
+        // フラグの状態を管理するオブジェクトを初期化
+        const flagStatuses: FlagStatuses = {};
+        flags.forEach((flag: FlagItem) => {
+          flagStatuses[flag.attributes.question_id] = true;
+        });
+
+        // フラグの状態をステートにセット
+        setFlagStatuses(flagStatuses);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
       }
     }
+  };
+
+  fetchUserInfo();
   }, [searchParams]);
+
+  const handleFlagClick = async (event: React.MouseEvent, questionId: string, flagStatus: boolean) => {
+    event.stopPropagation();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        notifications.show({
+          title: '認証',
+          message: 'フラグするにはログイン/新規登録が必要です。',
+          color: 'red',
+        });
+        console.error("ログインが必要です");
+        return;
+      }
+
+      let response;
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      if (!flagStatus) {
+        // フラグを追加するAPIリクエスト
+        response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/flags`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ flag: { question_id: questionId } }),
+        });
+      } else {
+        // フラグを削除するAPIリクエスト
+        response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/flags/${questionId}`, {
+          method: 'DELETE',
+          headers: headers,
+        });
+      }
+      if (response.ok) {
+        // フラグ状態の更新
+        // console.log('Current flag status:', flagStatuses[questionId]);
+        const updatedFlagStatus = !flagStatuses[questionId];
+        // console.log('Updated flag status:', updatedFlagStatus);
+        setFlagStatuses(prev => ({ ...prev, [questionId]: updatedFlagStatus }));
+      } else {
+        throw new Error(`Error: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error handling flag:', error);
+      notifications.show({
+        title: 'エラー',
+        message: 'フラグの操作に失敗しました。',
+        color: 'red',
+      });
+    }
+  };
+  
 
   const renderMarkdownAndLatex = async (markdownText: string) => {
     // 1. LaTeX数式のレンダリング
@@ -405,7 +501,14 @@ export default function QuestionsPage() {
                   )}
                   <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
                 </Container>
-
+                <Container size={660} p={0}>
+                  <IoFlag
+                    id={currentQuestion.id + "-flag-question"}
+                    className={classes.flagIcon}
+                    color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                    onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
+                  />
+                </Container>
                 <Container size={660} p={0} className={classes.buttonContainer}>
                   <SimpleGrid cols={5}>
                     {currentQuestion.relationships.choices.data.map((choiceRelation, index) => {
@@ -430,7 +533,7 @@ export default function QuestionsPage() {
               </Container>
             )}
           </div>
-          ) : (
+        ) : (
           <div>
             {currentQuestion && (
               <Container size={700} className={classes.wrapper} id={currentQuestion.id}>
@@ -480,6 +583,14 @@ export default function QuestionsPage() {
                     }`}
                   />
                   }
+                  </Container>
+                  <Container size={660} p={0}>
+                    <IoFlag
+                      id={currentQuestion.id + "-flag-answer"}
+                      className={classes.flagIcon}
+                      color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                      onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
+                    />
                   </Container>
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
