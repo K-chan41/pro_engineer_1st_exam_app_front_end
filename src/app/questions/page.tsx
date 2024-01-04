@@ -223,7 +223,8 @@ export default function QuestionsPage() {
   fetchUserInfo();
   }, [searchParams]);
 
-  const handleFlagClick = async (questionId, flagStatus) => {
+  const handleFlagClick = async (event, questionId, flagStatus) => {
+    event.stopPropagation();
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -488,8 +489,9 @@ export default function QuestionsPage() {
                 <Container size={660} p={0}>
                   <IoFlag
                     id={currentQuestion.id + "-flag-question"}
+                    className={classes.flagIcon}
                     color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                    onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
+                    onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
                   />
                 </Container>
                 <Container size={660} p={0} className={classes.buttonContainer}>
@@ -570,8 +572,9 @@ export default function QuestionsPage() {
                   <Container size={660} p={0}>
                     <IoFlag
                       id={currentQuestion.id + "-flag-answer"}
+                      className={classes.flagIcon}
                       color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                      onClick={() => handleFlagClick(currentQuestion.id, flagStatuses[currentQuestion.id])}
+                      onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
                     />
                   </Container>
                   <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
