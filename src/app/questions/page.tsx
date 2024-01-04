@@ -142,6 +142,21 @@ type UserAnswers = {
   [questionId: string]: UserAnswer;
 };
 
+interface IncludedItem {
+  type: string;
+}
+
+interface FlagItem {
+  attributes: {
+    question_id: string;
+    // 他の属性があればここに
+  };
+  // 他のプロパティがあればここに
+}
+
+interface FlagStatuses {
+  [key: string]: boolean;
+}
 
 const getSubjectDisplayName = (exam_subject: 'basic_subject' | 'aptitude_subject') => {
   if (exam_subject === 'basic_subject') {
@@ -158,7 +173,7 @@ export default function QuestionsPage() {
   const [choices, setChoices] = useState<Choice[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
-  const [flagStatuses, setFlagStatuses] = useState({}); 
+  const [flagStatuses, setFlagStatuses] = useState<FlagStatuses>({}); 
 
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
@@ -204,11 +219,11 @@ export default function QuestionsPage() {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
-        const flags = data.included.filter(item => item.type === 'flag');
+        const flags = data.included.filter((item: IncludedItem) => item.type === 'flag');
 
         // フラグの状態を管理するオブジェクトを初期化
-        const flagStatuses = {};
-        flags.forEach(flag => {
+        const flagStatuses: FlagStatuses = {};
+        flags.forEach((flag: FlagItem) => {
           flagStatuses[flag.attributes.question_id] = true;
         });
 
@@ -223,7 +238,7 @@ export default function QuestionsPage() {
   fetchUserInfo();
   }, [searchParams]);
 
-  const handleFlagClick = async (event, questionId, flagStatus) => {
+  const handleFlagClick = async (event: React.MouseEvent, questionId: string, flagStatus: boolean) => {
     event.stopPropagation();
     try {
       const token = localStorage.getItem('token');
