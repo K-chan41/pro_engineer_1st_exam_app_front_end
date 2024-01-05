@@ -187,53 +187,53 @@ export default function QuestionsPage() {
       const subjectIds = searchParams.getAll('subject_ids[]');
       // console.log(subjectIds);
 
-    if (subjectIds) {
-      const query = Array.isArray(subjectIds)
-        ? subjectIds.map(id => `subject_ids[]=${id}`).join('&')
-        : `subject_ids[]=${subjectIds}`;
+      if (subjectIds) {
+        const query = Array.isArray(subjectIds)
+          ? subjectIds.map(id => `subject_ids[]=${id}`).join('&')
+          : `subject_ids[]=${subjectIds}`;
 
-      fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/filter?${query}`)
-        .then(response => response.json())
-        .then((responseData: ApiResponse) => {
-          const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
-          const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
-          const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
-          const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
+        fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/filter?${query}`)
+          .then(response => response.json())
+          .then((responseData: ApiResponse) => {
+            const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
+            const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
+            const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
+            const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
 
-          setQuestions(fetchedQuestions);
-          setChoices(fetchedChoices);
-          setSubjects(fetchedSubjects);
-          setLabels(fetchedLabels);
-        })
-        .catch(error => {
-          console.error('Error fetching data:', error);
-        });
-    }
-  }
-      // ユーザー情報の取得とフラグの状態設定
-  const fetchUserInfo = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        const flags = data.included.filter((item: IncludedItem) => item.type === 'flag');
-
-        // フラグの状態を管理するオブジェクトを初期化
-        const flagStatuses: FlagStatuses = {};
-        flags.forEach((flag: FlagItem) => {
-          flagStatuses[flag.attributes.question_id] = true;
-        });
-
-        // フラグの状態をステートにセット
-        setFlagStatuses(flagStatuses);
-      } catch (error) {
-        console.error('Error fetching user info:', error);
+            setQuestions(fetchedQuestions);
+            setChoices(fetchedChoices);
+            setSubjects(fetchedSubjects);
+            setLabels(fetchedLabels);
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
       }
     }
-  };
+      // ユーザー情報の取得とフラグの状態設定
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await response.json();
+          const flags = data.included.filter((item: IncludedItem) => item.type === 'flag');
+
+          // フラグの状態を管理するオブジェクトを初期化
+          const flagStatuses: FlagStatuses = {};
+          flags.forEach((flag: FlagItem) => {
+            flagStatuses[flag.attributes.question_id] = true;
+          });
+
+          // フラグの状態をステートにセット
+          setFlagStatuses(flagStatuses);
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
+    };
 
   fetchUserInfo();
   }, [searchParams]);
