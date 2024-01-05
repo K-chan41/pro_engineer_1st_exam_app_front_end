@@ -6,7 +6,7 @@ import './globals.css';
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
 import '@mantine/notifications/styles.css';
-// import Head from 'next/head';
+import Head from 'next/head';
 
 // import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <html lang="ja">
-        <head>
+        <Head>
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             content="width=device-width, initial-scale=1.0"
           />
           <ColorSchemeScript />
-        </head>
+        </Head>
         <body>
           <AuthProvider>
             <MantineProvider theme={theme} defaultColorScheme="light">
@@ -79,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Footer />
             </MantineProvider>
           </AuthProvider>
+          {/* <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> */}
         </body>
       </html>
     </>
