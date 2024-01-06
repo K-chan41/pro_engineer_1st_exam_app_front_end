@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
-  metadataBase: 'https://www.proengineer1exam.com', 
+  metadataBase: new URL('https://www.proengineer1exam.com'), 
 };
 
 // const myColor: MantineColorsTuple = [
