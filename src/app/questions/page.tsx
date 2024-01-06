@@ -240,7 +240,7 @@ export default function QuestionsPage() {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info`, {
+          const response = await fetch(`http://localhost:4000/api/v1/user_info`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const data = await response.json();
@@ -314,7 +314,6 @@ export default function QuestionsPage() {
       });
     }
   };
-  
 
   const renderMarkdownAndLatex = async (markdownText: string) => {
     // 1. LaTeX数式のレンダリング
@@ -413,9 +412,13 @@ export default function QuestionsPage() {
 
   // 現在の問題を表示する
   const currentQuestion = questions[currentQuestionIndex];
-  const currentSubject = currentQuestion ? subjects.find(s => s.id === currentQuestion.relationships.subject.data.id) : null;
-  const currentLabel = currentQuestion ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) : null;
-  
+  const currentSubject = currentQuestion && currentQuestion.relationships.subject 
+                          ? subjects.find(s => s.id === currentQuestion.relationships.subject.data.id) 
+                          : null;
+  const currentLabel = currentQuestion && currentQuestion.relationships.label && currentQuestion.relationships.label.data
+                          ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) 
+                          : null;
+
   // Twitterテキスト
   const twitterDataText = `${currentSubject 
     ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}を学習中`
