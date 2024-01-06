@@ -394,6 +394,11 @@ export default function QuestionsPage() {
   const currentLabel = currentQuestion ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) : null;
   
   // Twitterテキスト
+  const twitterDataText = `${currentSubject 
+    ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}を学習中`
+    : ''
+  }`;
+
   // useEffect(() => {
   //   const text = `${currentSubject 
   //     ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}`
