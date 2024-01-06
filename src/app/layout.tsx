@@ -6,7 +6,7 @@ import './globals.css';
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
 import '@mantine/notifications/styles.css';
-// import Head from 'next/head';
+import Head from 'next/head';
 
 // import classes from './active.module.css';
 import { HeaderMenu } from '../components/HeaderMenu'
@@ -29,6 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
+  metadataBase: new URL('https://www.proengineer1exam.com'), 
 };
 
 // const myColor: MantineColorsTuple = [
@@ -62,15 +63,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <html lang="ja">
-        <head>
+        <Head>
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0"
           />
+          <meta property="og:image" content="https://www.proengineer1exam.com/opengraph-image.png" />
+          <meta property="og:image:type" content="image/png" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:image" content="https://www.proengineer1exam.com/twitter-image.png" />
+          <meta name="twitter:image:type" content="image/png" />
+          <meta name="twitter:image:width" content="1200" />
+          <meta name="twitter:image:height" content="630" />
           <ColorSchemeScript />
-        </head>
+        </Head>
         <body>
           <AuthProvider>
             <MantineProvider theme={theme} defaultColorScheme="light">
@@ -79,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Footer />
             </MantineProvider>
           </AuthProvider>
+          {/* <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> */}
         </body>
       </html>
     </>

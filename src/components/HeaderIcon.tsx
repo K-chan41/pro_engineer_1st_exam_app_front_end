@@ -22,7 +22,7 @@ import {
   IconChevronDown,
 } from '@tabler/icons-react';
 // import { MantineLogo } from '@mantinex/mantine-logo';
-import classes from './HeaderTabs.module.css';
+import classes from './HeaderIcon.module.css';
 import { useAuth } from './AuthContext';
 
 const tabs = [

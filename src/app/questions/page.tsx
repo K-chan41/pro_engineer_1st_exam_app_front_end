@@ -1,11 +1,12 @@
 'use client';
 
-import { Image, Text, Container, Checkbox, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
+import { Image, Text, Container, SimpleGrid, Button, Progress, Center, Group, Table } from '@mantine/core';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Notifications, notifications } from '@mantine/notifications';
 import { CiCircleCheck, CiCircleRemove, CiCircleMinus } from "react-icons/ci";
 import { convertToJapaneseEra } from '../../components/utils';
+import { TwitterShareButton } from '../../components/TwitterShareButton';
 import classes from './Questions.module.css';
 import { marked } from 'marked';
 import katex from 'katex';
@@ -178,6 +179,7 @@ export default function QuestionsPage() {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0); //　正当数カウント
+  // const [twitterDataText, setTwitterDataText] = useState("");
 
   const [isQuestionScreen, setIsQuestionScreen] = useState(true); // 問題と解答の画面切り替え
   const [isResultScreen, setIsResultScreen] = useState(false); // 結果画面への切り替え
@@ -390,6 +392,21 @@ export default function QuestionsPage() {
   const currentQuestion = questions[currentQuestionIndex];
   const currentSubject = currentQuestion ? subjects.find(s => s.id === currentQuestion.relationships.subject.data.id) : null;
   const currentLabel = currentQuestion ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) : null;
+  
+  // Twitterテキスト
+  const twitterDataText = `${currentSubject 
+    ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}を学習中`
+    : ''
+  }`;
+
+  // useEffect(() => {
+  //   const text = `${currentSubject 
+  //     ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}`
+  //     : ''
+  //   } ${questions.length}問中${correctAnswersCount}問正解 正解率: ${(correctAnswersCount / questions.length * 100).toFixed(1)}%`;
+    
+  //   setTwitterDataText(text);
+  // }, [correctAnswersCount, currentQuestionIndex, currentSubject, questions.length]);
 
   // 結果表示一覧表
   const rows = questions.map((question, index) => {
@@ -433,6 +450,13 @@ export default function QuestionsPage() {
                 </Table.Thead>
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
+            </Container>
+            <Container size={660} p={0} >
+              <Group justify="flex-end">
+                <TwitterShareButton
+                  dataText={twitterDataText}                      
+                />
+              </Group>
             </Container>
             <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button}>記録を保存（ログイン/新規登録）</Button>
           </Container>
@@ -501,13 +525,18 @@ export default function QuestionsPage() {
                   )}
                   <Text c="dimmed" ta="right" className={classes.detail}>第{currentQuestionIndex + 1}問目/選択問題数 全{questions.length}問</Text>
                 </Container>
-                <Container size={660} p={0}>
-                  <IoFlag
-                    id={currentQuestion.id + "-flag-question"}
-                    className={classes.flagIcon}
-                    color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                    onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
-                  />
+                <Container size={660} p={0} className="flagSns">
+                  <Group justify="space-between">
+                    <IoFlag
+                      id={currentQuestion.id + "-flag-question"}
+                      className={classes.flagIcon}
+                      color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                      onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
+                    />
+                    <TwitterShareButton
+                      dataText={twitterDataText}               
+                    />
+                  </Group>
                 </Container>
                 <Container size={660} p={0} className={classes.buttonContainer}>
                   <SimpleGrid cols={5}>
@@ -584,15 +613,20 @@ export default function QuestionsPage() {
                   />
                   }
                   </Container>
-                  <Container size={660} p={0}>
-                    <IoFlag
-                      id={currentQuestion.id + "-flag-answer"}
-                      className={classes.flagIcon}
-                      color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                      onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
-                    />
+                  <Container size={660} p={0} >
+                    <Group justify="space-between">
+                      <IoFlag
+                        id={currentQuestion.id + "-flag-answer"}
+                        className={classes.flagIcon}
+                        color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
+                        onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
+                      />
+                      <TwitterShareButton
+                        dataText={twitterDataText}                    
+                      />
+                    </Group>
                   </Container>
-                  <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
+                <Button fullWidth variant="filled" size="lg" color="blue" onClick={() => goToNextQuestion()} className={classes.button}>次の問題へ</Button>
               </Container>
             )}
           </div>
