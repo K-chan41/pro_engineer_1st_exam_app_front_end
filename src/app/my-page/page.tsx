@@ -94,7 +94,7 @@ export default function MyPage() {
     const fetchUserQuestionRelationInfo = async (token: string) => {
       if (fetchedToken) {
         try {
-          const response = await fetch(`http://localhost:4000/api/v1/user_question_relations`, {
+          const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_question_relations`, {
             method: 'GET',
             headers: headers,
           });
@@ -120,7 +120,7 @@ export default function MyPage() {
     const fetchFlags = async (token: string) => {
       if (fetchedToken) {
         try {
-          const response = await fetch(`http://localhost:4000/api/v1/flags`, {
+          const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/flags`, {
             method: 'GET',
             headers: headers,
           });
@@ -199,6 +199,19 @@ export default function MyPage() {
     };
   };
 
+  const navigateToFlaggedQuestions = (): void => {
+    if (!token) {
+      notifications.show({
+        title: '注意',
+        message: 'ログインが必要です！',
+        color: 'red',
+      });
+      return;
+    } {
+    router.push(`/questions?flagged_questions`);
+    };
+  };
+
   return (
     <>
       <Notifications containerWidth={800} notificationMaxHeight={800} position="top-center" />
@@ -248,6 +261,7 @@ export default function MyPage() {
                 <Table.Tbody>{flagRows}</Table.Tbody>
               </Table>
             </Container>
+            <Button fullWidth variant="filled" size="sm" color="blue" className={classes.button} onClick={navigateToFlaggedQuestions}>フラグした問題をテストする（10問）</Button>
           </Container>
         </div>
       ) : (

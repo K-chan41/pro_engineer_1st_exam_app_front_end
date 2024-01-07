@@ -216,7 +216,7 @@ export default function QuestionsPage() {
 
       if (shuffle) {
         const token = localStorage.getItem('token');
-        fetch('http://localhost:4000/api/v1/questions/shuffle', {
+        fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/shuffle', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(response => response.json())
@@ -238,7 +238,7 @@ export default function QuestionsPage() {
 
       if (recentMistakes) {
         const token = localStorage.getItem('token');
-        fetch('http://localhost:4000/api/v1/questions/recent_mistakes', {
+        fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/recent_mistakes', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(response => response.json())
@@ -260,7 +260,7 @@ export default function QuestionsPage() {
 
       if (flaggedQuestions) {
         const token = localStorage.getItem('token');
-        fetch('http://localhost:4000/api/v1/questions/flagged_questions', {
+        fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/flagged_questions', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(response => response.json())
@@ -285,7 +285,7 @@ export default function QuestionsPage() {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await fetch(`http://localhost:4000/api/v1/user_info`, {
+          const response = await fetch(`https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_info`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const data = await response.json();
@@ -497,7 +497,7 @@ export default function QuestionsPage() {
     }
   
     try {
-      const response = await fetch('http://localhost:4000/api/v1/user_question_relations', {
+      const response = await fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_question_relations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
