@@ -188,6 +188,7 @@ export default function QuestionsPage() {
       const subjectIds = searchParams.getAll('subject_ids[]');
       const shuffle = searchParams.getAll('shuffle');
       const recentMistakes = searchParams.getAll('recent_mistakes');
+      const flaggedQuestions = searchParams.getAll('flagged_questions');
       // console.log(subjectIds);
 
       if (subjectIds) {
@@ -238,6 +239,28 @@ export default function QuestionsPage() {
       if (recentMistakes) {
         const token = localStorage.getItem('token');
         fetch('http://localhost:4000/api/v1/questions/recent_mistakes', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => response.json())
+        .then((responseData: ApiResponse) => {
+          const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
+          const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
+          const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
+          const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
+
+          setQuestions(fetchedQuestions);
+          setChoices(fetchedChoices);
+          setSubjects(fetchedSubjects);
+          setLabels(fetchedLabels);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+      }
+
+      if (flaggedQuestions) {
+        const token = localStorage.getItem('token');
+        fetch('http://localhost:4000/api/v1/questions/flagged_questions', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(response => response.json())
