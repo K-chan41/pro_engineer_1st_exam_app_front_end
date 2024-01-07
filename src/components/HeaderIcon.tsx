@@ -10,15 +10,9 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useRouter } from 'next/navigation';
 import {
   IconLogout,
-  IconHeart,
-  IconStar,
-  IconMessage,
-  IconSettings,
-  IconPlayerPause,
-  IconTrash,
-  IconSwitchHorizontal,
   IconChevronDown,
 } from '@tabler/icons-react';
 // import { MantineLogo } from '@mantinex/mantine-logo';
@@ -40,14 +34,17 @@ export function HeaderIcon() {
   const theme = useMantineTheme();
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
-
   const { auth, logout } = useAuth();
   const currentUser = auth.user;
+  const router = useRouter();
 
   const user = {
     name: currentUser.name,
-    email: 'janspoon@fighter.dev',
-    image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
+    image: 'icon-user.png',
+  };
+
+  const goToMyPage = () => {
+    router.push(`/my-page`);
   };
 
   const handleLogout = () => {
@@ -76,8 +73,8 @@ export function HeaderIcon() {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Item>
-            <Text fw={500} size="sm" lh={1} mr={3}>
-                {currentUser.data.attributes.name}
+            <Text fw={500} size="sm" lh={2} mr={3} onClick={goToMyPage}>
+              {currentUser.data.attributes.name}
             </Text>
           </Menu.Item>
 

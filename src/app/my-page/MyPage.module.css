@@ -1,0 +1,24 @@
+.wrapper {
+  padding-top: rem(100px);
+  padding-bottom: rem(60px);
+}
+
+.table {
+  margin-top: var(--mantine-spacing-md);
+  margin-bottom: var(--mantine-spacing-md);
+}
+
+.underline {
+  width: 16em;
+  margin: 0 auto;
+  margin-bottom: rem(5px);
+}
+
+.title {
+  margin-bottom: rem(30px);
+}
+
+.button {
+  margin-top: rem(20px);
+  margin-bottom: rem(40px);
+}

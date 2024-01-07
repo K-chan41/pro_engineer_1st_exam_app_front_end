@@ -174,12 +174,11 @@ export default function QuestionsPage() {
   const [choices, setChoices] = useState<Choice[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
-  const [flagStatuses, setFlagStatuses] = useState<FlagStatuses>({}); 
+  const [flagStatuses, setFlagStatuses] = useState<FlagStatuses>({});
 
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
-  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); //　正当数カウント
-  // const [twitterDataText, setTwitterDataText] = useState("");
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // 正当数カウント
 
   const [isQuestionScreen, setIsQuestionScreen] = useState(true); // 問題と解答の画面切り替え
   const [isResultScreen, setIsResultScreen] = useState(false); // 結果画面への切り替え
@@ -187,6 +186,9 @@ export default function QuestionsPage() {
   useEffect(() => {
     if (searchParams) {
       const subjectIds = searchParams.getAll('subject_ids[]');
+      const shuffle = searchParams.getAll('shuffle');
+      const recentMistakes = searchParams.getAll('recent_mistakes');
+      const flaggedQuestions = searchParams.getAll('flagged_questions');
       // console.log(subjectIds);
 
       if (subjectIds) {
@@ -210,6 +212,72 @@ export default function QuestionsPage() {
           .catch(error => {
             console.error('Error fetching data:', error);
           });
+      }
+
+      if (shuffle) {
+        const token = localStorage.getItem('token');
+        fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/shuffle', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => response.json())
+        .then((responseData: ApiResponse) => {
+          const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
+          const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
+          const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
+          const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
+
+          setQuestions(fetchedQuestions);
+          setChoices(fetchedChoices);
+          setSubjects(fetchedSubjects);
+          setLabels(fetchedLabels);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+      }
+
+      if (recentMistakes) {
+        const token = localStorage.getItem('token');
+        fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/recent_mistakes', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => response.json())
+        .then((responseData: ApiResponse) => {
+          const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
+          const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
+          const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
+          const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
+
+          setQuestions(fetchedQuestions);
+          setChoices(fetchedChoices);
+          setSubjects(fetchedSubjects);
+          setLabels(fetchedLabels);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+      }
+
+      if (flaggedQuestions) {
+        const token = localStorage.getItem('token');
+        fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/questions/flagged_questions', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => response.json())
+        .then((responseData: ApiResponse) => {
+          const fetchedQuestions = responseData.data.filter(item => item.type === 'question') as Question[];
+          const fetchedChoices = responseData.included.filter(item => item.type === 'choice') as Choice[];
+          const fetchedSubjects = responseData.included.filter(item => item.type === 'subject') as Subject[];
+          const fetchedLabels = responseData.included.filter(item => item.type === 'label') as Label[];
+
+          setQuestions(fetchedQuestions);
+          setChoices(fetchedChoices);
+          setSubjects(fetchedSubjects);
+          setLabels(fetchedLabels);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
       }
     }
       // ユーザー情報の取得とフラグの状態設定
@@ -291,7 +359,6 @@ export default function QuestionsPage() {
       });
     }
   };
-  
 
   const renderMarkdownAndLatex = async (markdownText: string) => {
     // 1. LaTeX数式のレンダリング
@@ -300,11 +367,11 @@ export default function QuestionsPage() {
     }).replace(/\\\[(.*?)\\\]/g, (match: any, formula: string) => {
       return katex.renderToString(formula, { throwOnError: false, displayMode: true });
     });
-  
+
     // 2. Markdownのレンダリング
     return marked(latexProcessedText);
   };
-  
+
   const MyComponent = ({ content }: MyComponentProps) => {
     const [renderedContent, setRenderedContent] = useState('');
   
@@ -390,23 +457,18 @@ export default function QuestionsPage() {
 
   // 現在の問題を表示する
   const currentQuestion = questions[currentQuestionIndex];
-  const currentSubject = currentQuestion ? subjects.find(s => s.id === currentQuestion.relationships.subject.data.id) : null;
-  const currentLabel = currentQuestion ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) : null;
-  
+  const currentSubject = currentQuestion && currentQuestion.relationships.subject 
+                          ? subjects.find(s => s.id === currentQuestion.relationships.subject.data.id) 
+                          : null;
+  const currentLabel = currentQuestion && currentQuestion.relationships.label && currentQuestion.relationships.label.data
+                          ? labels.find(s => s.id === currentQuestion.relationships.label.data.id) 
+                          : null;
+
   // Twitterテキスト
   const twitterDataText = `${currentSubject 
     ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}を学習中`
     : ''
   }`;
-
-  // useEffect(() => {
-  //   const text = `${currentSubject 
-  //     ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}`
-  //     : ''
-  //   } ${questions.length}問中${correctAnswersCount}問正解 正解率: ${(correctAnswersCount / questions.length * 100).toFixed(1)}%`;
-    
-  //   setTwitterDataText(text);
-  // }, [correctAnswersCount, currentQuestionIndex, currentSubject, questions.length]);
 
   // 結果表示一覧表
   const rows = questions.map((question, index) => {
@@ -422,6 +484,48 @@ export default function QuestionsPage() {
       </Table.Tr>
     );
   });
+
+  const saveUserAnswers = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      notifications.show({
+        title: '認証エラー',
+        message: 'ログインが必要です。',
+        color: 'red',
+      });
+      return;
+    }
+  
+    try {
+      const response = await fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/user_question_relations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_answers: userAnswers
+        })
+      });
+
+      if (response.ok) {
+        notifications.show({
+          title: '成功',
+          message: '解答が保存されました。',
+          color: 'green',
+        });
+      } else {
+        throw new Error('解答の保存に失敗しました。');
+      }
+    } catch (error) {
+      console.error('Error saving user answers:', error);
+      notifications.show({
+        title: 'エラー',
+        message: '解答の保存に失敗しました。',
+        color: 'red',
+      });
+    }
+  };
 
   return (
     <>
@@ -451,14 +555,14 @@ export default function QuestionsPage() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Container>
-            <Container size={660} p={0} >
+            <Container size={660} p={0} className="flagSns">
               <Group justify="flex-end">
                 <TwitterShareButton
-                  dataText={twitterDataText}                      
+                  dataText={twitterDataText}
                 />
               </Group>
             </Container>
-            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button}>記録を保存（ログイン/新規登録）</Button>
+            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button} onClick={saveUserAnswers}>記録を保存（ログイン/新規登録）</Button>
           </Container>
         </div>
       ):(
@@ -534,7 +638,7 @@ export default function QuestionsPage() {
                       onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
                     />
                     <TwitterShareButton
-                      dataText={twitterDataText}               
+                      dataText={twitterDataText}           
                     />
                   </Group>
                 </Container>
