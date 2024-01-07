@@ -186,6 +186,19 @@ export default function MyPage() {
     };
   };
 
+  const navigateToRecentMistakes = (): void => {
+    if (!token) {
+      notifications.show({
+        title: '注意',
+        message: 'ログインが必要です！',
+        color: 'red',
+      });
+      return;
+    } {
+    router.push(`/questions?recent_mistakes`);
+    };
+  };
+
   return (
     <>
       <Notifications containerWidth={800} notificationMaxHeight={800} position="top-center" />
@@ -217,7 +230,7 @@ export default function MyPage() {
                 <Table.Tbody>{incorrectRows}</Table.Tbody>
               </Table>
             </Container>
-            {/* <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button} onClick={saveUserAnswers}>記録を保存（ログイン/新規登録）</Button> */}
+            <Button fullWidth variant="filled" size="sm" color="blue" className={classes.button} onClick={navigateToRecentMistakes}>間違えた問題をテストする（10問）</Button>
             <Text c="dimmed" ta="center">最近フラグした問題</Text>
             <Center>
               <Divider color="gray" size="xs" className={classes.underline}/>
