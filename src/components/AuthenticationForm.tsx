@@ -106,6 +106,7 @@ export function AuthenticationForm(props: PaperProps) {
           {type === 'register' && (
             <TextInput
               required
+              size="md"
               label="名前"
               placeholder="Your name"
               value={form.values.name}
@@ -117,6 +118,7 @@ export function AuthenticationForm(props: PaperProps) {
 
           <TextInput
             required
+            size="md"
             label="メールアドレス"
             placeholder="Your email"
             value={form.values.email}
@@ -127,6 +129,7 @@ export function AuthenticationForm(props: PaperProps) {
 
           <PasswordInput
             required
+            size="md"
             label="パスワード"
             placeholder="Your password"
             value={form.values.password}
