@@ -174,12 +174,11 @@ export default function QuestionsPage() {
   const [choices, setChoices] = useState<Choice[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
-  const [flagStatuses, setFlagStatuses] = useState<FlagStatuses>({}); 
+  const [flagStatuses, setFlagStatuses] = useState<FlagStatuses>({});
 
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({}); // ユーザーの解答を管理するための状態
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題のインデックス
-  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); //　正当数カウント
-  // const [twitterDataText, setTwitterDataText] = useState("");
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // 正当数カウント
 
   const [isQuestionScreen, setIsQuestionScreen] = useState(true); // 問題と解答の画面切り替え
   const [isResultScreen, setIsResultScreen] = useState(false); // 結果画面への切り替え
@@ -322,11 +321,11 @@ export default function QuestionsPage() {
     }).replace(/\\\[(.*?)\\\]/g, (match: any, formula: string) => {
       return katex.renderToString(formula, { throwOnError: false, displayMode: true });
     });
-  
+
     // 2. Markdownのレンダリング
     return marked(latexProcessedText);
   };
-  
+
   const MyComponent = ({ content }: MyComponentProps) => {
     const [renderedContent, setRenderedContent] = useState('');
   
@@ -425,15 +424,6 @@ export default function QuestionsPage() {
     : ''
   }`;
 
-  // useEffect(() => {
-  //   const text = `${currentSubject 
-  //     ? `${convertToJapaneseEra(currentSubject.attributes.year)}度 技術士 第一次試験 ${getSubjectDisplayName(currentSubject.attributes.exam_subject as 'basic_subject' | 'aptitude_subject')}`
-  //     : ''
-  //   } ${questions.length}問中${correctAnswersCount}問正解 正解率: ${(correctAnswersCount / questions.length * 100).toFixed(1)}%`;
-    
-  //   setTwitterDataText(text);
-  // }, [correctAnswersCount, currentQuestionIndex, currentSubject, questions.length]);
-
   // 結果表示一覧表
   const rows = questions.map((question, index) => {
     const userAnswer = userAnswers[question.id];
@@ -448,6 +438,48 @@ export default function QuestionsPage() {
       </Table.Tr>
     );
   });
+
+  const saveUserAnswers = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      notifications.show({
+        title: '認証エラー',
+        message: 'ログインが必要です。',
+        color: 'red',
+      });
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:4000/api/v1/user_question_relations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_answers: userAnswers
+        })
+      });
+
+      if (response.ok) {
+        notifications.show({
+          title: '成功',
+          message: '解答が保存されました。',
+          color: 'green',
+        });
+      } else {
+        throw new Error('解答の保存に失敗しました。');
+      }
+    } catch (error) {
+      console.error('Error saving user answers:', error);
+      notifications.show({
+        title: 'エラー',
+        message: '解答の保存に失敗しました。',
+        color: 'red',
+      });
+    }
+  };
 
   return (
     <>
@@ -477,14 +509,14 @@ export default function QuestionsPage() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Container>
-            <Container size={660} p={0} >
+            <Container size={660} p={0} className="flagSns">
               <Group justify="flex-end">
                 <TwitterShareButton
-                  dataText={twitterDataText}                      
+                  dataText={twitterDataText}
                 />
               </Group>
             </Container>
-            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button}>記録を保存（ログイン/新規登録）</Button>
+            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button} onClick={saveUserAnswers}>記録を保存（ログイン/新規登録）</Button>
           </Container>
         </div>
       ):(
@@ -560,7 +592,7 @@ export default function QuestionsPage() {
                       onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
                     />
                     <TwitterShareButton
-                      dataText={twitterDataText}               
+                      dataText={twitterDataText}           
                     />
                   </Group>
                 </Container>
