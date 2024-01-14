@@ -7,6 +7,7 @@ import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } f
 import { Metadata } from 'next';
 import '@mantine/notifications/styles.css';
 import Head from 'next/head';
+import { Suspense } from "react";
 
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { HeaderMenu } from '../components/HeaderMenu'
@@ -64,7 +65,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <>
       <html lang="ja">
         <Head>
+        <Suspense fallback={<></>}>
           <GoogleAnalytics />
+        </Suspense>
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta
