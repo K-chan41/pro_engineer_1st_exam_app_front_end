@@ -8,7 +8,7 @@ import { Metadata } from 'next';
 import '@mantine/notifications/styles.css';
 import Head from 'next/head';
 
-// import classes from './active.module.css';
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { HeaderMenu } from '../components/HeaderMenu'
 import { Footer } from '../components/Footer'
 import { AuthProvider } from '../components/AuthContext';
@@ -64,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <>
       <html lang="ja">
         <Head>
+          <GoogleAnalytics />
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta
