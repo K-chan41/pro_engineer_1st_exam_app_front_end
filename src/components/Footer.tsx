@@ -34,7 +34,7 @@ export function Footer() {
           </Group>
           <Center>
             <Text c="dimmed" size="xs">
-              © 2023 proengineer1exam.com All rights reserved.
+              © 2024 proengineer1exam.com All rights reserved.
             </Text>
           </Center>
         </div>
