@@ -1,22 +1,30 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 import { existsGaId, GA_MEASUREMENT_ID, pageview } from "../lib/gtag";
 
-const GoogleAnalytics = () => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+const GoogleAnalytics: React.FC = () => {
+  const router = useRouter();
 
   useEffect(() => {
-    if (!existsGaId || !searchParams) {
+    if (!existsGaId) {
       return;
     }
-    const url = pathname + searchParams.toString();
-    pageview(url);
-  }, [pathname, searchParams]);
+
+    const handleRouteChange = (url: string) => {
+      console.log(`Route changed to: ${url}`);
+      pageview(url);
+    };
+
+    // ルート変更時にページビューをトラッキング
+    router.events.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router.events]);
 
   return (
     <>

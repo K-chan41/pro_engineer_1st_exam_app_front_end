@@ -65,9 +65,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <>
       <html lang="ja">
         <Head>
-        <Suspense fallback={<></>}>
+        {/* <Suspense fallback={<></>}> */}
           <GoogleAnalytics />
-        </Suspense>
+        {/* </Suspense> */}
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta
