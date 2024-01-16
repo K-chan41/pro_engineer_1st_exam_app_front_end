@@ -6,10 +6,10 @@ import './globals.css';
 import { MantineProvider, ColorSchemeScript, createTheme, MantineColorsTuple } from '@mantine/core';
 import { Metadata } from 'next';
 import '@mantine/notifications/styles.css';
-import Head from 'next/head';
+// import Head from 'next/head';
 import { Suspense } from "react";
 
-import GoogleAnalytics from "@/components/GoogleAnalytics";
+import GoogleAnalytics from '../components/GoogleAnalytics'
 import { HeaderMenu } from '../components/HeaderMenu'
 import { Footer } from '../components/Footer'
 import { AuthProvider } from '../components/AuthContext';
@@ -64,10 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <html lang="ja">
-        <Head>
-        {/* <Suspense fallback={<></>}> */}
-          <GoogleAnalytics />
-        {/* </Suspense> */}
+        <head>
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta
@@ -85,8 +82,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta name="twitter:image:width" content="1200" />
           <meta name="twitter:image:height" content="630" />
           <ColorSchemeScript />
-        </Head>
+        </head>
         <body>
+          <Suspense>
+            <GoogleAnalytics />
+          </Suspense>
           <AuthProvider>
             <MantineProvider theme={theme} defaultColorScheme="light">
               <HeaderMenu />
