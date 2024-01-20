@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { Image, Container, Text, rem, Tabs, Checkbox, Group, Button } from '@mantine/core';
+import { Image, Container, Text, rem, Tabs, Checkbox, Group, Button, Loader, Center } from '@mantine/core';
 import { ReportSearch, Ballpen } from 'tabler-icons-react';
 import { convertToJapaneseEra } from '../components/utils';
 import classes from './HeroBullets.module.css';
@@ -29,7 +29,10 @@ export default function Home() {
   const topImage = 'top-image.svg';
   const iconStyle = { width: rem(12), height: rem(12) };
 
+  const [isLoading, setIsLoading] = useState(true); // ローディング状態
+
   useEffect(() => {
+    setIsLoading(true); // フェッチ開始時にローディングをtrueにしてUI表示
     // バックエンドから科目データを取得する
     fetch('https://pro-engineer-1st-exam-app-api-d4afe40512f5.herokuapp.com/api/v1/subjects')
       .then(response => response.json())
@@ -44,6 +47,7 @@ export default function Home() {
           .sort((a: Subject, b: Subject) => b.attributes.year - a.attributes.year); // 年度で降順にソート
   
         setSubjects({ basic_subject: basic, aptitude_subject: aptitude });
+        setIsLoading(false); // データ処理が完了したらローディングをfalseに
       });
   }, []);
 
@@ -120,33 +124,39 @@ export default function Home() {
             </Tabs.Tab>
           </Tabs.List>
 
-          <Suspense fallback={<p>Loading feed...</p>}>
-            <Tabs.Panel value="basic_subject" pb="lg">
-              <Group className={classes.group}>
-                {subjects.basic_subject.map((subject: Subject) => (
-                  <Checkbox 
-                    key={subject.id} 
-                    label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
-                    value={subject.id} 
-                    onChange={() => handleSubjectChange(subject.id)}
-                  />
-                ))}
-              </Group>
-            </Tabs.Panel>
-            <Tabs.Panel value="aptitude_subject"  pb="lg">
-              <Group className={classes.group}>
-                {subjects.aptitude_subject.map((subject: Subject) => (
-                  <Checkbox 
-                    key={subject.id} 
-                    label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
-                    value={subject.id} 
-                    checked={selectedSubjectIds.includes(subject.id)} 
-                    onChange={() => handleSubjectChange(subject.id)}
-                  />
-                ))}
-              </Group>
-            </Tabs.Panel>
-          </Suspense>
+          {isLoading ? (
+            <Center>
+              <Loader color="blue" type="dots" />
+            </Center>
+          ) : (
+            <>
+              <Tabs.Panel value="basic_subject" pb="lg">
+                <Group className={classes.group}>
+                  {subjects.basic_subject.map((subject: Subject) => (
+                    <Checkbox 
+                      key={subject.id} 
+                      label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
+                      value={subject.id} 
+                      onChange={() => handleSubjectChange(subject.id)}
+                    />
+                  ))}
+                </Group>
+              </Tabs.Panel>
+              <Tabs.Panel value="aptitude_subject"  pb="lg">
+                <Group className={classes.group}>
+                  {subjects.aptitude_subject.map((subject: Subject) => (
+                    <Checkbox 
+                      key={subject.id} 
+                      label={`${convertToJapaneseEra(subject.attributes.year)}度 ${getSubjectDisplayName(subject.attributes.exam_subject)} (全${subject.relationships.questions.data.length}問)`}
+                      value={subject.id} 
+                      checked={selectedSubjectIds.includes(subject.id)} 
+                      onChange={() => handleSubjectChange(subject.id)}
+                    />
+                  ))}
+                </Group>
+              </Tabs.Panel>
+            </>
+          )}
         </Tabs >
         <Button fullWidth variant="filled" size="lg" color="blue" onClick={navigateToQuestions} className={classes.button}>出題開始 (合計{totalQuestions}問)</Button>
       </Container>
