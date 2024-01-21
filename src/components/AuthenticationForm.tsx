@@ -38,7 +38,7 @@ export function AuthenticationForm(props: PaperProps) {
       name: (val) => type === 'register' && (val.trim().length < 2 ? '名前は2文字以上で入力してください' : null),
       email: (val) => (/^\S+@\S+$/.test(val) ? null : '有効なメールアドレスを入力してください'),
       password: (val) => (val.length < 6 ? 'パスワードには少なくとも6文字を含める必要があります' : null),
-      terms: (value) => (value === true ? null : '利用規約とプライバシーポリシーに同意する必要があります'),
+      terms: (value) => type === 'register' && (value !== true ? '利用規約とプライバシーポリシーに同意する必要があります' : null),
     },
   });
 
