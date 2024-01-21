@@ -10,6 +10,7 @@ import { TwitterShareButton } from '../../components/TwitterShareButton';
 import classes from './Questions.module.css';
 import { marked } from 'marked';
 import katex from 'katex';
+import { IconContext } from 'react-icons'
 import { IoFlag } from "react-icons/io5";
 
 interface QuestionAttributes {
@@ -314,11 +315,10 @@ export default function QuestionsPage() {
       const token = localStorage.getItem('token');
       if (!token) {
         notifications.show({
-          title: '認証',
-          message: 'フラグするにはログイン/新規登録が必要です。',
+          title: 'フラグするにはログインが必要です',
+          message: '右上のメニューからログイン/新規登録してください',
           color: 'red',
         });
-        console.error("ログインが必要です");
         return;
       }
 
@@ -631,12 +631,13 @@ export default function QuestionsPage() {
                 </Container>
                 <Container size={660} p={0} className="flagSns">
                   <Group justify="space-between">
-                    <IoFlag
-                      id={currentQuestion.id + "-flag-question"}
-                      className={classes.flagIcon}
-                      color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                      onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
-                    />
+                    <IconContext.Provider value={flagStatuses[currentQuestion.id] ? { color: '#228BE6' } : {color: '#868E96'}}>
+                      <IoFlag
+                        id={currentQuestion.id + "-flag-question"}
+                        className={classes.flagIcon}
+                        onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
+                      />
+                    </IconContext.Provider>
                     <TwitterShareButton
                       dataText={twitterDataText}           
                     />
@@ -719,12 +720,13 @@ export default function QuestionsPage() {
                   </Container>
                   <Container size={660} p={0} >
                     <Group justify="space-between">
-                      <IoFlag
-                        id={currentQuestion.id + "-flag-answer"}
-                        className={classes.flagIcon}
-                        color={flagStatuses[currentQuestion.id] ? 'blue' : 'grey'}
-                        onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
-                      />
+                      <IconContext.Provider value={flagStatuses[currentQuestion.id] ? { color: '#228BE6' } : {color: '#868E96'}}>
+                        <IoFlag
+                          id={currentQuestion.id + "-flag-answer"}
+                          className={classes.flagIcon}
+                          onClick={(e) => handleFlagClick(e, currentQuestion.id, flagStatuses[currentQuestion.id])}
+                        />
+                      </IconContext.Provider>
                       <TwitterShareButton
                         dataText={twitterDataText}                    
                       />
