@@ -31,13 +31,14 @@ export function AuthenticationForm(props: PaperProps) {
       email: '',
       name: '',
       password: '',
-      terms: true,
+      terms: false,
     },
 
     validate: {
       name: (val) => type === 'register' && (val.trim().length < 2 ? '名前は2文字以上で入力してください' : null),
       email: (val) => (/^\S+@\S+$/.test(val) ? null : '有効なメールアドレスを入力してください'),
       password: (val) => (val.length < 6 ? 'パスワードには少なくとも6文字を含める必要があります' : null),
+      terms: (value) => (value === true ? null : '利用規約とプライバシーポリシーに同意する必要があります'),
     },
   });
 
@@ -143,6 +144,7 @@ export function AuthenticationForm(props: PaperProps) {
               label="利用規約とプライバシーポリシーに同意します"
               checked={form.values.terms}
               onChange={(event) => form.setFieldValue('terms', event.currentTarget.checked)}
+              error={form.errors.terms && '利用規約とプライバシーポリシーに同意する必要があります'}
             />
           )}
         </Stack>

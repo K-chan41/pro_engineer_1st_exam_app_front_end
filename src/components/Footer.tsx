@@ -42,15 +42,21 @@ export function Footer() {
         <Group className={classes.links}>{items}</Group>
 
         <Group gap="xs" justify="flex-end" wrap="nowrap">
-          <ActionIcon size="lg" variant="default" radius="xl">
-            <IconBrandX style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
-          </ActionIcon>
-          <ActionIcon size="lg" variant="default" radius="xl">
-            <IconBrandGithub style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
-          </ActionIcon>
-          <ActionIcon size="lg" variant="default" radius="xl">
-            <IconCurrencyQuetzal style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
-          </ActionIcon>
+          <Anchor href="https://twitter.com/mimi048599" target="_blank">
+            <ActionIcon size="lg" variant="default" radius="xl">
+              <IconBrandX style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+            </ActionIcon>
+          </Anchor>
+          <Anchor href="https://github.com/K-chan41" target="_blank">
+            <ActionIcon size="lg" variant="default" radius="xl">
+              <IconBrandGithub style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+            </ActionIcon>
+          </Anchor>
+          <Anchor href="https://qiita.com/K-Chan41" target="_blank">
+            <ActionIcon size="lg" variant="default" radius="xl">
+              <IconCurrencyQuetzal style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+            </ActionIcon>
+          </Anchor>
         </Group>
       </div>
     </div>
