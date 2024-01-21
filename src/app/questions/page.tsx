@@ -489,8 +489,8 @@ export default function QuestionsPage() {
     const token = localStorage.getItem('token');
     if (!token) {
       notifications.show({
-        title: '認証エラー',
-        message: 'ログインが必要です。',
+        title: '正誤記録を保存するためにはログインが必要です',
+        message: '右上のメニューからログイン/新規登録をしてください',
         color: 'red',
       });
       return;
@@ -555,14 +555,14 @@ export default function QuestionsPage() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Container>
-            <Container size={660} p={0} className="flagSns">
+            {/* <Container size={660} p={0} className="flagSns">
               <Group justify="flex-end">
                 <TwitterShareButton
                   dataText={twitterDataText}
                 />
               </Group>
-            </Container>
-            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button} onClick={saveUserAnswers}>記録を保存（ログイン/新規登録）</Button>
+            </Container> */}
+            <Button fullWidth variant="filled" size="lg" color="blue" className={classes.button} onClick={saveUserAnswers}>記録を保存</Button>
           </Container>
         </div>
       ):(
