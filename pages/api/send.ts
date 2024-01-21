@@ -52,20 +52,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     `,
   };
 
-  transporter.sendMail(msgToManager, function (err, info) {
-    if (err) {
-      console.log("Error occurred: ", err);
-    } else {
-      console.log("Message sent: ", info);
-    }
-  });
-  
-  transporter.sendMail(msgToUser, function (err, info) {
-    if (err) {
-      console.log("Error occurred: ", err);
-    } else {
-      console.log("Message sent: ", info);
-    }
+  Promise.all([
+    transporter.sendMail(msgToManager),
+    transporter.sendMail(msgToUser)
+  ]).then(() => {
+    res.status(200).json({ message: 'Success' });
+  }).catch((err) => {
+    console.error("Error occurred: ", err);
+    res.status(500).json({ message: 'Error sending mail' });
   });
 }
 

@@ -29,7 +29,6 @@ const Contact = () => {
   });
 
   const handleSubmit = (values: FormValues) => {
-    console.log(values);
     registerUser(values);
   };
 
