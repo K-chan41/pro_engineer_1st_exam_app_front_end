@@ -82,6 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta name="twitter:image:width" content="1200" />
           <meta name="twitter:image:height" content="630" />
           <ColorSchemeScript />
+          <meta name="google-site-verification" content="0YHK9qB4c08Fs-VUZToOlRfmFf2PXTld2IEr4KFqIqM" />
         </head>
         <body>
           <Suspense>
