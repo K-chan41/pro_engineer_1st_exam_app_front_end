@@ -107,7 +107,7 @@ export default function Home() {
         <div className={classes.inner}>
           <div className={classes.content}>
             <Text className={classes.text} c="dimmed" mt="md" size="base">
-              公益社団法人日本技術士会が年1回開催する技術士1次試験の基礎科目と適性科目の過去問対策ができるサービスです。過去問を実際に解き、解答を選択し、正解不正解を確認できます。 <br /> 解説を読むことにより、学習をすることができます。 <br /> ユーザー登録をしていただくと、問題にフラグを立てたり、間違えた問題を復習することができます。
+              公益社団法人日本技術士会が年1回開催する技術士1次試験の基礎科目と適性科目の過去問対策が無料でできるサービスです。過去問を実際に解き、解答を選択し、正解不正解を確認できます。 <br /> 本Webアプリ内の解説を読むことにより、学習をすることができます。 <br /> アプリにユーザー登録をしていただくと、問題にフラグを立てたり、マイページにて間違えた問題を復習することができます。
             </Text>
           </div>
           <Image src={topImage} className={classes.image} alt="Top-image" />
