@@ -120,7 +120,7 @@ export default function Home() {
               基礎科目
             </Tabs.Tab>
             <Tabs.Tab value="aptitude_subject" leftSection={<ReportSearch size={32} strokeWidth={2} color={'black'}/>}>
-              適正科目
+              適性科目
             </Tabs.Tab>
           </Tabs.List>
 

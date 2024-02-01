@@ -16,13 +16,13 @@ import { AuthProvider } from '../components/AuthContext';
 
 export const metadata: Metadata = {
   title: {
-    default: '技術士1次試験 基礎•適正科目 過去問ドリル',
+    default: '技術士1次試験 基礎•適性科目 過去問ドリル',
     template: `%s | 過去問ドリル`,
   },
   description: '公益社団法人日本技術士会が年1回開催する技術士1次試験の基礎科目と適性科目の過去問対策が無料できるWebアプリ',
   openGraph: {
     title: {
-      default: '技術士1次試験 基礎•適正科目 過去問ドリル',
+      default: '技術士1次試験 基礎•適性科目 過去問ドリル',
       template: `%s | 過去問ドリル`,
     },
     description: '',

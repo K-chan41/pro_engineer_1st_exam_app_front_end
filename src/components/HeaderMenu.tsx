@@ -12,7 +12,7 @@ import { useAuth } from './AuthContext';
 export function HeaderMenu() {
   const [opened, { open, close }] = useDisclosure(false);
   const logoSrc = 'header-logo.png';
-  const logoText = '技術士1次試験 基礎•適正科目 過去問ドリル';
+  const logoText = '技術士1次試験 基礎•適性科目 過去問ドリル';
 
   const { auth } = useAuth();
   const currentUser = auth.user;

@@ -30,7 +30,7 @@ export function Footer() {
         <div>
           <Group>
             <Image src='header-logo.png' alt="Logo" h={30} />
-            <Text size="md" fw={900} className={classes.logoText}>技術士1次試験 基礎•適正科目 過去問ドリル</Text>
+            <Text size="md" fw={900} className={classes.logoText}>技術士1次試験 基礎•適性科目 過去問ドリル</Text>
           </Group>
           <Center>
             <Text c="dimmed" size="xs">
