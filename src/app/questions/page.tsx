@@ -187,12 +187,12 @@ export default function QuestionsPage() {
   useEffect(() => {
     if (searchParams) {
       const subjectIds = searchParams.getAll('subject_ids[]');
-      const shuffle = searchParams.getAll('shuffle');
-      const recentMistakes = searchParams.getAll('recent_mistakes');
-      const flaggedQuestions = searchParams.getAll('flagged_questions');
-      // console.log(subjectIds);
+      const shuffle = searchParams.getAll('shuffle').length != 0 ;
+      const recentMistakes = searchParams.getAll('recent_mistakes').length != 0;
+      const flaggedQuestions = searchParams.getAll('flagged_questions').length !=0;
+      // console.log(recentMistakes);
 
-      if (subjectIds) {
+      if (subjectIds.length != 0) {
         const query = Array.isArray(subjectIds)
           ? subjectIds.map(id => `subject_ids[]=${id}`).join('&')
           : `subject_ids[]=${subjectIds}`;
