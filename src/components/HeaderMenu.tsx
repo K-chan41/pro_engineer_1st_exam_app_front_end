@@ -1,8 +1,7 @@
 'use client';
 
-import { Modal, Group, Center, Burger, Container, Image, Text, Drawer, Button } from '@mantine/core';
+import { Group, Center, Burger, Container, Image, Text, Drawer, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconChevronDown } from '@tabler/icons-react';
 import classes from './HeaderMenu.module.css';
 import Link from 'next/link';
 import { HeaderIcon } from './HeaderIcon';
@@ -17,28 +16,6 @@ export function HeaderMenu() {
   const { auth } = useAuth();
   const currentUser = auth.user;
 
-  if (currentUser) {
-    return (
-      <>
-        <header className={classes.header}>
-          <Container size="md">
-            <div className={classes.inner}>
-              <Link href="/" className={classes.headerLink}>
-                <Center>
-                  <Image src={logoSrc} alt="Logo" h={40} />
-                  <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
-                </Center>
-              </Link>
-              <Group gap={1}>
-                <HeaderIcon />
-              </Group>
-            </div>
-          </Container>
-        </header>
-      </>
-    )
-  };
-
   return (
     <>
       <header className={classes.header}>
@@ -46,19 +23,36 @@ export function HeaderMenu() {
           <div className={classes.inner}>
             <Link href="/" className={classes.headerLink}>
               <Center>
-                  <Image src={logoSrc} alt="Logo" h={40} />
-                  <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
+                <Image src={logoSrc} alt="Logo" h={40} />
+                <Text size="lg" fw={900} className={classes.logoText}>{logoText}</Text>
               </Center>
             </Link>
-            <Group gap={5} visibleFrom="sm">
-              <Drawer opened={opened} onClose={close} title="ログイン / 新規登録" position="right">
-                <AuthenticationForm/>
-              </Drawer>
-              <Button onClick={open} variant="subtle" color="gray">ログイン</Button>
-            </Group>
-              <Burger opened={opened} onClick={open} size="sm" hiddenFrom="sm" />
+            {currentUser ? (
+              <Group gap={1}>
+                <HeaderIcon />
+              </Group>
+            ) : (
+              <>
+                <Group gap={5} visibleFrom="sm">
+                  <Button onClick={open} variant="subtle" color="gray">ログイン</Button>
+                </Group>
+                <Burger opened={opened} onClick={open} size="sm" hiddenFrom="sm" />
+              </>
+            )}
           </div>
         </Container>
+        <div className={classes.announcement}>
+          <Container size="md">
+            <Text className={classes.announcementText}>
+              2026年5月をもってサービスを終了します。ご利用いただきましてありがとうございました。
+            </Text>
+          </Container>
+        </div>
+        {!currentUser && (
+          <Drawer opened={opened} onClose={close} title="ログイン / 新規登録" position="right">
+            <AuthenticationForm/>
+          </Drawer>
+        )}
       </header>
     </>
   );

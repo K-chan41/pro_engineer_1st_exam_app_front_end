@@ -1,7 +1,7 @@
 .header {
   position: fixed;
   width: 100%;
-  height: rem(56px);
+  height: rem(96px);
   margin-bottom: rem(12px);
   background-color: var(--mantine-color-body);
   border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
@@ -51,4 +51,42 @@
   font-size: 1rem; /* フォントサイズを指定 */
   margin-left: 0.5rem; /* 画像とテキストの間のスペース */
   /* その他のスタイル */
+}
+
+.announcement {
+  min-height: rem(40px);
+  display: flex;
+  align-items: center;
+  background-color: var(--mantine-color-yellow-1);
+  border-top: rem(1px) solid var(--mantine-color-yellow-3);
+}
+
+.announcementText {
+  color: var(--mantine-color-dark-8);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+  .header {
+    height: rem(104px);
+  }
+
+  .logoText {
+    max-width: rem(220px);
+    font-size: rem(13px);
+    line-height: 1.25;
+  }
+
+  .announcement {
+    min-height: rem(48px);
+    padding-top: rem(4px);
+    padding-bottom: rem(4px);
+  }
+
+  .announcementText {
+    font-size: rem(12px);
+  }
 }

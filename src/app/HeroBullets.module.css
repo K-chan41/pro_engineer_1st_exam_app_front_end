@@ -4,7 +4,7 @@
   padding-top: calc(var(--mantine-spacing-xl) * 4);
   padding-bottom: calc(var(--mantine-spacing-xl) * 1);
   @media (max-width: $mantine-breakpoint-xs) {
-    padding-top: calc(var(--mantine-spacing-xl) * 2);
+    padding-top: calc(var(--mantine-spacing-xl) * 4);
     padding-bottom: calc(var(--mantine-spacing-xl) * 1);
   }
 }
